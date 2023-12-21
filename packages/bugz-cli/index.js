@@ -1,7 +1,7 @@
 import createBugzClient from 'bugz-api';
 
 (async () => {
-    const bugzClient = createBugzClient({ domain: 'http://fogbugz01.smartpakequine.com', token: 'dean6p7keifsjpch20or1297s5rb38' });
+    const bugzClient = createBugzClient({ domain: '', token: '' });
 
     const query = { id: 122301 };
 
