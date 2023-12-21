@@ -1,0 +1,14 @@
+{
+  "name": "bugz-api",
+  "version": "1.0.0",
+  "description": "A simple API to interact with Fogbugz",
+  "main": "index.js",
+  "keywords": [],
+  "author": "Stephen M. Wilson",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "xml2js": "^0.6.2"
+  }
+}
