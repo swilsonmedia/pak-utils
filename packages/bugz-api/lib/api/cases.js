@@ -24,6 +24,24 @@ const defaultOptions = {
     max: MAX_DEFAULT_RECORDS,
 }
 
+function makeEditable(response) {
+    const addEdit = (c) => {
+        c.edit = async parameters => await edit(c.ixBug, parameters);
+    };
+
+    if (Array.isArray(response.case)) {
+        response.case.forEach(c => addEdit(c));
+    }
+
+    if (Array.isArray(response.cases)) {
+        response.cases.forEach(cs => {
+            cs.case.forEach(c => addEdit(c));
+        });
+    }
+
+    return response;
+}
+
 export async function list(filter = 'inbox', parameters) {
     let sFilter = filter;
     let params = parameters;
@@ -33,12 +51,12 @@ export async function list(filter = 'inbox', parameters) {
         params = filter;
     }
 
-    return await fogBugzFetch({
+    return makeEditable(await fogBugzFetch({
         ...defaultOptions,
         sFilter,
         cmd: commands.LIST_CASES,
         ...params
-    });
+    }));
 }
 
 export async function search(query, parameters) {
@@ -46,12 +64,12 @@ export async function search(query, parameters) {
         throw new TypeError('cases.search requires a query argument');
     }
 
-    return await fogBugzFetch({
+    return makeEditable(await fogBugzFetch({
         ...defaultOptions,
         q: query,
         cmd: commands.SEARCH,
         ...parameters
-    });
+    }));
 }
 
 export async function view(id, parameters) {
@@ -59,12 +77,12 @@ export async function view(id, parameters) {
         throw new TypeError('cases.view requires an id argument');
     }
 
-    return await fogBugzFetch({
+    return makeEditable(await fogBugzFetch({
         ...defaultOptions,
         ixbug: id,
         cmd: commands.VIEW_CASE,
         ...parameters
-    });
+    }));
 }
 
 export async function edit(id, parameters = {}) {
