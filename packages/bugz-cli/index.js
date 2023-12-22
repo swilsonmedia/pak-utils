@@ -9,7 +9,9 @@ dotenv.config();
         origin: `${process.env.FB_ORIGIN}`
     });
 
-    const response = await client.people.byEmail('steph');
+    const response = await client.cases.list();
+
+
 
     console.log(response);
 })();
