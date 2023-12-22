@@ -11,37 +11,39 @@
 
 ### Parameters
 
-| Name      | Type   | Description   |
-|-----------|--------|---------------|
-| `id`      | number |  (required)     |
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `id`   | string |  (required) - the ixPerson |
 
 Example
 
 ```js
-
-const case = await bugzClient.people.byId(123);
-
+const response = await client.people.byId('548');
 ```
 
 Example Response
 
-```json
+```js
 {
-  ixPerson: '123',
-  sFullName: 'Marshall Mathers',
-  sEmail: 'snoop.dogg@example.com',
-  sPhone: '',
-  fAdministrator: 'false',
-  fCommunity: 'false',
-  fVirtual: 'false',
-  fDeleted: 'false',
-  sHomepage: '',
-  sLocale: '*',
-  sLanguage: '*',
-  sTimeZoneKey: '*',
-  sSnippetKey: '`',
-  ixBugWorkingOn: '0',
-  nType: '0'
+  person: [
+    {
+      ixPerson: '548',
+      sFullName: 'Marshall Mathers',
+      sEmail: 'slim.shady@example.com',
+      sPhone: '',
+      fAdministrator: 'false',
+      fCommunity: 'false',
+      fVirtual: 'false',
+      fDeleted: 'false',
+      sHomepage: '',
+      sLocale: '*',
+      sLanguage: '*',
+      sTimeZoneKey: '*',
+      sSnippetKey: '`',
+      ixBugWorkingOn: '0',
+      nType: '0'
+    }
+  ]
 }
 ```
 
@@ -49,131 +51,140 @@ Example Response
 
 ### Parameters
 
-| Name         | Type   | Description                                 |
-|--------------|--------|---------------------------------------------|
-| `email`      | string |  (required)     full or partial email address |
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `email`   | string |  (required) - a full or partial email address |
 
 Example
 
 ```js
-
-const case = await bugzClient.people.byEmail('marshall.mathers@example.com');
-
+const response = await client.people.byEmail('slim.shady@example.com');
 ```
 
 Example Response
 
-```json
-[
-  {
-    ixPerson: '123',
-    sFullName: 'Marshall Mathers',
-    sEmail: 'marshall.mathers@example.com',
-    sPhone: '',
-    fAdministrator: 'false',
-    fCommunity: 'false',
-    fVirtual: 'false',
-    fDeleted: 'false',
-    sHomepage: '',
-    sLocale: '*',
-    sLanguage: '*',
-    sTimeZoneKey: '*',
-    sSnippetKey: '`',
-    ixBugWorkingOn: '0',
-    nType: '0'
-  }
-]
+```js
+{ 
+  people: [ 
+    { 
+      person: [  
+        {
+          ixPerson: '548',
+          sFullName: 'Marshall Mathers',
+          sEmail: 'slim.shady@example.com',
+          sPhone: '',
+          fAdministrator: 'false',
+          fCommunity: 'false',
+          fVirtual: 'false',
+          fDeleted: 'false',
+          fNotify: 'true',
+          sHomepage: '',
+          sLocale: '*',
+          sLanguage: '*',
+          sTimeZoneKey: '*',
+          sLDAPUid: '',
+          dtLastActivity: '2023-12-22T02:46:35Z',
+          fRecurseBugChildren: 'true',
+          fPaletteExpanded: 'false',
+          ixBugWorkingOn: '0',
+          sFrom: ''
+        }
+      ] 
+    } 
+  ] 
+}
 ```
 
 ## byName
 
 ### Parameters
 
-| Name         | Type   | Description                                 |
-|--------------|--------|---------------------------------------------|
-| `name`       | string |  (required)     full or partial name          |
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `name`   | string |  (required) - a full or partial name |
 
 Example
 
 ```js
-
-const case = await bugzClient.people.byName('Marshall Mathers');
-
+const response = await client.people.byName('Marshal Mathers');
 ```
 
 Example Response
 
-```json
-[
-  {
-    ixPerson: '123',
-    sFullName: 'Marshall Mathers',
-    sEmail: 'marshall.mathers@example.com',
-    sPhone: '',
-    fAdministrator: 'false',
-    fCommunity: 'false',
-    fVirtual: 'false',
-    fDeleted: 'false',
-    sHomepage: '',
-    sLocale: '*',
-    sLanguage: '*',
-    sTimeZoneKey: '*',
-    sSnippetKey: '`',
-    ixBugWorkingOn: '0',
-    nType: '0'
-  }
-]
+```js
+{ 
+  people: [ 
+    { 
+      person: [  
+        {
+          ixPerson: '548',
+          sFullName: 'Marshall Mathers',
+          sEmail: 'slim.shady@example.com',
+          sPhone: '',
+          fAdministrator: 'false',
+          fCommunity: 'false',
+          fVirtual: 'false',
+          fDeleted: 'false',
+          fNotify: 'true',
+          sHomepage: '',
+          sLocale: '*',
+          sLanguage: '*',
+          sTimeZoneKey: '*',
+          sLDAPUid: '',
+          dtLastActivity: '2023-12-22T02:46:35Z',
+          fRecurseBugChildren: 'true',
+          fPaletteExpanded: 'false',
+          ixBugWorkingOn: '0',
+          sFrom: ''
+        }
+      ] 
+    } 
+  ] 
+}
 ```
 
 ## list
 
+
+
 Example
 
 ```js
-
-const case = await bugzClient.people.list();
-
+const response = await client.people.list();
 ```
 
 Example Response
 
-```json
-[
-  {
-    ixPerson: '123',
-    sFullName: 'Marshall Mathers',
-    sEmail: 'marshall.mathers@example.com',
-    sPhone: '',
-    fAdministrator: 'false',
-    fCommunity: 'false',
-    fVirtual: 'false',
-    fDeleted: 'false',
-    sHomepage: '',
-    sLocale: '*',
-    sLanguage: '*',
-    sTimeZoneKey: '*',
-    sSnippetKey: '`',
-    ixBugWorkingOn: '0',
-    nType: '0'
-  },
-  {
-    ixPerson: '234',
-    sFullName: 'Snoop Dogg',
-    sEmail: 'snoop.dogg@example.com',
-    sPhone: '',
-    fAdministrator: 'false',
-    fCommunity: 'false',
-    fVirtual: 'false',
-    fDeleted: 'false',
-    sHomepage: '',
-    sLocale: '*',
-    sLanguage: '*',
-    sTimeZoneKey: '*',
-    sSnippetKey: '`',
-    ixBugWorkingOn: '0',
-    nType: '0'
-  }
-]
+```js
+{ 
+  people: [ 
+    { 
+      person: [  
+        {
+          ixPerson: '548',
+          sFullName: 'Marshall Mathers',
+          sEmail: 'slim.shady@example.com',
+          sPhone: '',
+          fAdministrator: 'false',
+          fCommunity: 'false',
+          fVirtual: 'false',
+          fDeleted: 'false',
+          fNotify: 'true',
+          sHomepage: '',
+          sLocale: '*',
+          sLanguage: '*',
+          sTimeZoneKey: '*',
+          sLDAPUid: '',
+          dtLastActivity: '2023-12-22T02:46:35Z',
+          fRecurseBugChildren: 'true',
+          fPaletteExpanded: 'false',
+          ixBugWorkingOn: '0',
+          sFrom: ''
+        }
+      ] 
+    } 
+  ] 
+}
 ```
 
 [Back](../readme.md)

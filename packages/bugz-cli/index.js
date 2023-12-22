@@ -1,16 +1,15 @@
-import createBugzClient from 'bugz-api';
+import bugzClient from 'bugz-api';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 (async () => {
-    const bugzClient = createBugzClient({ domain: '', token: '' });
-
-    const query = { id: 122301 };
-
-    query[bugzClient.cases.columns.caseNote] = "New Note!!"
-
-    const response = await bugzClient.cases.view({
-        [bugzClient.cases.columns.id]: 122301,
-        columns: [bugzClient.cases.columns.caseNotes]
+    const client = bugzClient({
+        token: `${process.env.FB_TOKEN}`,
+        origin: `${process.env.FB_ORIGIN}`
     });
 
-    console.log(response)
+    const response = await client.people.byEmail('steph');
+
+    console.log(response);
 })();

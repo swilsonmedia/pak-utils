@@ -2,161 +2,78 @@
 
 ## Available Methods
 
-* [byId](#byid)
 * [edit](#edit)
 * [list](#list)
 * [search](#search)
 * [view](#view)
-
-## Available Columns
-
-| Name               | Type   | Description                                               |
-|--------------------|--------|-----------------------------------------------------------|
-| `id`               | number | The id of bug/case                                       |
-| `title`            | string | The title of the bug                                      |
-| `project`          | number | The id of the project that the bug is under               |
-| `assignedTo`       | number | The id of the person who the bug is currently assigned to |
-| `caseMilestone`    | string | The current milestone                                     |
-| `readyForSprintQA` | number | Ready for sprint QA                                       |
-| `qaTestable`       | string | QA Testable                                               |
-| `caseSummary`      | string | Summary and notes for QA                                  |
-| `caseNotes`        | string | Case notes                                                |
-
-Column constants are available on
-
-```js 
-bugzClient.cases.columns
-```
-
-## byId
-
-### Parameters
-
-| Name      | Type   | Description   |
-|-----------|--------|---------------|
-| `options` | object |  (required)     |
-
-#### Options Properties
-
-| Property      | Type   | Description                                      |
-|---------------|--------|--------------------------------------------------|
-| `id`          | number |  (required)     - The case id                    |
-| `columns`     | array  |  (optional)    - an array of valid column strings|
-| `max`         | number | (optional) - number of cases to return           |
-
-Example
-
-```js
-
-const options = {
-    id: 555, 
-    columns: ['sTitle']
-};
-
-const case = await bugzClient.cases.byId(options);
-
-```
-
-Example Response
-
-```json
-{
-  id: '122133',
-  operations: 'edit,assign,resolve',
-  title: "Hey this is your case title"
-}
-```
+* [getCustomFieldOptions](#getcustomcieldoptions)
 
 ## edit
 
 ### Parameters
 
-| Name      | Type   | Description   |
-|-----------|--------|---------------|
-| `options` | object |  (required)     |
 
-#### Options Properties
-
-| Property                      | Type              | Description                                                                            |
-|-------------------------------|-------------------|----------------------------------------------------------------------------------------|
-| `id`                          | number            |  (required) - The case id                                                              |
-| [columns](#available-columns) | depends on column |  (all are optional) see list of available columns to update [here](#available-columns) |
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `id`      | string |  (required) - The case id |
+| `parameters` | object | [available properties](#available-columns) |
 
 Example
 
 ```js
-
-const options = {
-    id: 122133, 
-    [bugzClient.cases.columns.title]: 'new title',
-    ...otherColumnsToUpdate
-};
-
-const case = await bugzClient.cases.edit(options);
-
+const response = await client.cases.edit('122133', {
+    'sTitle': 'new title'
+});
 ```
 
 Example Response
 
-```json
-{
-  id: '122133',
-  operations: 'edit,assign,resolve',
-}
+```js
+{ case: [ { ixBug: '122133', operations: 'edit,assign,resolve' } ] }
 ```
 
 ## list
 
-### Parameters
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `filterId`   | string | The filter Id. Default is "inbox" |
+| `parameters` | object | max , cols  |
 
-| Name      | Type   | Description   |
-|-----------|--------|---------------|
-| `options` | object | (optional)    |
-
-#### Options Properties
-
-| Property      | Type             | Description                                       | Default |
-|---------------|------------------|---------------------------------------------------|---------|
-| `filter`      | string           | (optional) - the fitler 'sFilter' value           | 'inbox' |
-| `columns`     | array            |  (optional)    - an array of valid column strings  |         |
-| `max`         | number           | (optional) - number of cases to return            |         |
+* *"max" is the maximum number of records returned. Defaults to 100 if not overridden*
+* *"cols is a comma separated list of [available properties](#available-columns)*
 
 Example
 
 ```js
-
-const options = {
-    filter: 555, 
-    columns: ['sTitle'],
-    max: 3
-};
-
-const case = await bugzClient.cases.list(options);
-
+const response = await client.cases.list('1172', { 
+  max: 5, 
+  cols: 'sTitle, sEvent' 
+});
 ```
 
 Example Response
 
-```json
+```js
 {
-  description: 'All open cases in Inbox',
-  sFilter: 'inbox',
-  cases: [
-    {
-      id: '122133',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 1"
-    },
-    {
-      id: '122279',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 2"
-    },
-    {
-      id: '121510',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 3"
-    }
+  description: 'All open cases assigned to Stephen Wilson',
+  sFilter: '1172',
+  cases: [ 
+    { 
+      count: '2', 
+      totalHits: '2', 
+      case: [
+        {
+          ixBug: '1234',
+          operations: 'edit,assign,resolve',
+          sTitle: "Case 1"
+        },
+        {
+          ixBug: '1235',
+          operations: 'edit,assign,resolve',
+          sTitle: 'Case 2'
+        }
+      ] 
+    } 
   ]
 }
 ```
@@ -165,52 +82,46 @@ Example Response
 
 ### Parameters
 
-| Name      | Type   | Description   |
-|-----------|--------|---------------|
-| `options` | object | (optional)    |
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `search`   | string | search for string |
+| `parameters` | object | max , cols  |
 
-#### Options Properties
-
-| Property      | Type             | Description                                       |
-|---------------|------------------|---------------------------------------------------|
-| `search`      | string           | (optional) - string to search for                 |
-| `columns`     | array            |  (optional)    - an array of valid column strings  | 
-| `max`         | number           | (optional) - number of cases to return            |
+* *"max" is the maximum number of records returned. Defaults to 100 if not overridden*
+* *"cols is a comma separated list of [available properties](#available-columns)*
 
 Example
 
 ```js
-
-const options = {
-    filter: 555, 
-    columns: ['sTitle'],
-    max: 3
-};
-
-const case = await bugzClient.cases.list(options);
-
+const response = await client.cases.search('Case Title', { 
+  max: 5, 
+  cols: 'sTitle' 
+});
 ```
 
 Example Response
 
-```json
+```js
 {
-  cases: [
-    {
-      id: '122133',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 1"
-    },
-    {
-      id: '122279',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 2"
-    },
-    {
-      id: '121510',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 3"
-    }
+  description: 'All open cases assigned to Stephen Wilson',
+  sFilter: '1172',
+  cases: [ 
+    { 
+      count: '2', 
+      totalHits: '2', 
+      case: [
+        {
+          ixBug: '1234',
+          operations: 'edit,assign,resolve',
+          sTitle: "Case 1"
+        },
+        {
+          ixBug: '1235',
+          operations: 'edit,assign,resolve',
+          sTitle: 'Case 2'
+        }
+      ] 
+    } 
   ]
 }
 ```
@@ -219,53 +130,77 @@ Example Response
 
 ### Parameters
 
-| Name      | Type   | Description   |
-|-----------|--------|---------------|
-| `options` | object | (required)    |
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `id`   | string | id of the bug case |
+| `parameters` | object | max , cols  |
 
-#### Options Properties
-
-| Property      | Type             | Description                                       |
-|---------------|------------------|---------------------------------------------------|
-| `id`          | number           | (required) - The case number                      |
-| `columns`     | array            |  (optional)    - an array of valid column strings  | 
+* *"max" is the maximum number of records returned. Defaults to 100 if not overridden*
+* *"cols is a comma separated list of [available properties](#available-columns)*
 
 Example
 
 ```js
-
-const options = {
-    filter: 555, 
-    columns: ['sTitle'],
-    max: 3
-};
-
-const case = await bugzClient.cases.list(options);
-
+const response = await client.cases.view('122119', { 
+  cols: 'sTitle' 
+});
 ```
 
 Example Response
 
-```json
+```js
 {
-  cases: [
+  case: [
     {
-      id: '122133',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 1"
-    },
-    {
-      id: '122279',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 2"
-    },
-    {
-      id: '121510',
-      operations: 'edit,assign,resolve',
-      title: "Case Title 3"
+      ixBug: '122119',
+      operations: 'edit,reopen',
+      sTitle: 'FED Story: Display video hero'
     }
   ]
 }
 ```
+
+## getCustomFieldOptions
+
+### Parameters
+
+| Property  | Type  | Description |
+|-----------|-------|-------------|
+| `columnName` | string | name of the [column](#available-columns) |
+
+*Custom field columns are prefixed with **"plugin_customfields_at_fogcreek_com_"***
+
+Example
+
+```js
+const response = cases.getCustomFieldOptions('columnName');
+```
+
+Example Response
+
+```js
+[ 'Yes', 'No' ]
+```
+
+## Available Columns
+
+| Name               | Type   | Description                                               |
+|--------------------|--------|-----------------------------------------------------------|
+| `ixBug`               | number | The id of bug/case                                       |
+| `sTitle`            | string | The title of the bug                                      |
+| `ixProject`          | number | The id of the project that the bug is under               |
+| `ixPersonAssignedTo`       | number | The id of the person who the bug is currently assigned to |
+| `plugin_customfields_at_fogcreek_com_casexmilestoneh849`    | string | The current milestone                                     |
+| `plugin_customfields_at_fogcreek_com_readyxforxsprintxqaj71b` | number | Ready for sprint QA                                       |
+| `plugin_customfields_at_fogcreek_com_qaxtestablek42`       | string | QA Testable                                               |
+| `plugin_customfields_at_fogcreek_com_casexsummaryp32b`      | string | Summary and notes for QA                                  |
+| `sEvent`        | string | Case notes                                                |
+
+Column constants are available on
+
+```js 
+cases.columns
+```
+
 
 [Back](../readme.md)

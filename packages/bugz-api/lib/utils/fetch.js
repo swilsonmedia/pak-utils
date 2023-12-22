@@ -15,8 +15,10 @@ export async function fetchXMLAPI(url) {
     const xml = await response.text();
     const result = await parseXMLResponse(xml);
 
-    if (result?.response?.error?.length) {
-        throw new Error(result?.response?.error[0]._);
+    if (result.response.error) {
+        return {
+            error: result.response.error[0]._
+        }
     }
 
     return unwrap(result.response);

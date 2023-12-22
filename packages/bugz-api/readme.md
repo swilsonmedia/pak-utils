@@ -10,16 +10,16 @@ npm install bugz-api
 
 ### Creating a client
 ```js
-import createBugzClient from 'bugz-api';
+import bugzClient from 'bugz-api';
 
-const bugzClient = createBugzClient({
+const client = bugzClient({
     token: 'asdfghjklqwer', // your private token
-    domain: 'http://fogbugz.example.com/' // your base fogbugz URL
+    domain: 'http://fogbugz.example.com' // your base fogbugz URL
 });
 
 ```
 
-## createBugzClient
+## bugzClient
 
 ### Parameters
 
@@ -32,10 +32,10 @@ const bugzClient = createBugzClient({
 | Property     | Type   | Description                                                           |
 |--------------|--------|-----------------------------------------------------------------------|
 | `token`      | string |  (required) - The access token in your account that enables API calls |
-| `domain`     | string |  (required) - The base URL of your fogbugz site                       |
+| `origin`     | string |  (required) - The base URL of your fogbugz site                       |
 
 ## Available APIs
 * [cases](./docs/cases.md)
 * [filters](./docs/filters.md)
 * [people](./docs/people.md)
-* [customFields](./docs/customfields.md)
+
