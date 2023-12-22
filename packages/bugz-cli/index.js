@@ -9,9 +9,7 @@ dotenv.config();
         origin: `${process.env.FB_ORIGIN}`
     });
 
-    const response = await client.cases.list();
-
-
+    const response = await client.cases.list('1172', { cols: 'sTitle', max: 5 });
 
     console.log(response);
 })();

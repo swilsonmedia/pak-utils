@@ -29,17 +29,31 @@ function makeEditable(response) {
         c.edit = async parameters => await edit(c.ixBug, parameters);
     };
 
-    if (Array.isArray(response.case)) {
-        response.case.forEach(c => addEdit(c));
+    if (response.case) {
+        addEdit(response.case);
     }
 
     if (Array.isArray(response.cases)) {
-        response.cases.forEach(cs => {
-            cs.case.forEach(c => addEdit(c));
-        });
+        response.cases.forEach(c => addEdit(c));
     }
 
     return response;
+}
+
+function formatCasesResponse(response) {
+    const { case: cases, count, totalHits } = response.cases[0];
+    return {
+        ...response,
+        cases,
+        count,
+        totalHits
+    };
+}
+
+function formatCaseResponse(response) {
+    return {
+        'case': response.case[0]
+    };
 }
 
 export async function list(filter = 'inbox', parameters) {
@@ -51,12 +65,18 @@ export async function list(filter = 'inbox', parameters) {
         params = filter;
     }
 
-    return makeEditable(await fogBugzFetch({
+    const response = await fogBugzFetch({
         ...defaultOptions,
         sFilter,
         cmd: commands.LIST_CASES,
         ...params
-    }));
+    });
+
+    if (response.error) {
+        return response;
+    }
+
+    return makeEditable(formatCasesResponse(response));
 }
 
 export async function search(query, parameters) {
@@ -64,12 +84,18 @@ export async function search(query, parameters) {
         throw new TypeError('cases.search requires a query argument');
     }
 
-    return makeEditable(await fogBugzFetch({
+    const response = await fogBugzFetch({
         ...defaultOptions,
         q: query,
         cmd: commands.SEARCH,
         ...parameters
-    }));
+    });
+
+    if (response.error) {
+        return response;
+    }
+
+    return makeEditable(formatCasesResponse(response));
 }
 
 export async function view(id, parameters) {
@@ -77,12 +103,14 @@ export async function view(id, parameters) {
         throw new TypeError('cases.view requires an id argument');
     }
 
-    return makeEditable(await fogBugzFetch({
+    const response = await fogBugzFetch({
         ...defaultOptions,
         ixbug: id,
         cmd: commands.VIEW_CASE,
         ...parameters
-    }));
+    });
+
+    return makeEditable(formatCaseResponse(response));
 }
 
 export async function edit(id, parameters = {}) {
@@ -97,12 +125,14 @@ export async function edit(id, parameters = {}) {
         throw new TypeError(`"${invalidColumn}" is an editable column`);
     }
 
-    return await fogBugzFetch({
+    const response = await fogBugzFetch({
         ...defaultOptions,
         ixbug: id,
         cmd: commands.EDIT,
         ...parameters
     });
+
+    return formatCaseResponse(response);
 }
 
 

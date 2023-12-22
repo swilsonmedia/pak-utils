@@ -29,7 +29,12 @@ const response = await client.cases.edit('122133', {
 Example Response
 
 ```js
-{ case: [ { ixBug: '122133', operations: 'edit,assign,resolve' } ] }
+{ 
+  case: { 
+    ixBug: '122133', 
+    operations: 'edit,assign,resolve' 
+  }
+}
 ```
 
 ## list
@@ -57,23 +62,19 @@ Example Response
 {
   description: 'All open cases assigned to Stephen Wilson',
   sFilter: '1172',
+  count: '2', 
+  totalHits: '2', 
   cases: [ 
-    { 
-      count: '2', 
-      totalHits: '2', 
-      case: [
-        {
-          ixBug: '1234',
-          operations: 'edit,assign,resolve',
-          sTitle: "Case 1"
-        },
-        {
-          ixBug: '1235',
-          operations: 'edit,assign,resolve',
-          sTitle: 'Case 2'
-        }
-      ] 
-    } 
+    {
+      ixBug: '1234',
+      operations: 'edit,assign,resolve',
+      sTitle: "Case 1"
+    },
+    {
+      ixBug: '1235',
+      operations: 'edit,assign,resolve',
+      sTitle: 'Case 2'
+    }
   ]
 }
 ```
@@ -103,26 +104,20 @@ Example Response
 
 ```js
 {
-  description: 'All open cases assigned to Stephen Wilson',
-  sFilter: '1172',
-  cases: [ 
-    { 
-      count: '2', 
-      totalHits: '2', 
-      case: [
-        {
-          ixBug: '1234',
-          operations: 'edit,assign,resolve',
-          sTitle: "Case 1"
-        },
-        {
-          ixBug: '1235',
-          operations: 'edit,assign,resolve',
-          sTitle: 'Case 2'
-        }
-      ] 
-    } 
-  ]
+  cases: [
+    {
+      ixBug: '1234',
+      operations: 'edit,assign,resolve',
+      sTitle: "Case 1"
+    },
+    {
+      ixBug: '1235',
+      operations: 'edit,assign,resolve',
+      sTitle: 'Case 2'
+    }
+  ],
+  count: '2',
+  totalHits: '343'
 }
 ```
 
@@ -150,13 +145,11 @@ Example Response
 
 ```js
 {
-  case: [
-    {
-      ixBug: '122119',
-      operations: 'edit,reopen',
-      sTitle: 'FED Story: Display video hero'
-    }
-  ]
+  case: {
+    ixBug: '122119',
+    operations: 'edit,reopen',
+    sTitle: 'FED Story: Display video hero'
+  }
 }
 ```
 

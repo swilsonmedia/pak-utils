@@ -7,20 +7,18 @@ const types = {
 }
 
 export async function list() {
-    return await fogBugzFetch({
+    const response = await fogBugzFetch({
         cmd: 'listFilters',
     });
+
+    return Array.isArray(response.filters) ? response.filters[0].filter : response;
 }
 
 function typeFilter(type) {
     return async () => {
         const response = await list();
 
-        if (Array.isArray(response.filters)) {
-            response.filters[0].filter = response.filters[0].filter.filter(f => f.type === type);
-        }
-
-        return response;
+        return Array.isArray(response) ? response.filter(f => f.type === type) : response;
     }
 }
 

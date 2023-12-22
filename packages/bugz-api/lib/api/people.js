@@ -11,17 +11,19 @@ const commands = {
 }
 
 export async function list() {
-    return await fogBugzFetch({
+    const response = await fogBugzFetch({
         cmd: commands.LIST
     });
+
+    return Array.isArray(response.people) ? response.people[0].person : response;
 }
 
 function filterPeopleByStringProperty(propName) {
     return async (propValue) => {
         const response = await list();
 
-        if (Array.isArray(response.people)) {
-            response.people[0].person = response.people[0].person.filter(person => {
+        if (Array.isArray(response)) {
+            return response.filter(person => {
                 const val = propValue.toLowerCase().trim();
 
                 return (propName === filterProps.NAME && /\s+/gi.test(val)) || (propName === filterProps.EMAIL && /@/gi.test(val))
@@ -38,8 +40,10 @@ export const byName = filterPeopleByStringProperty(filterProps.NAME);
 export const byEmail = filterPeopleByStringProperty(filterProps.EMAIL);
 
 export async function byId(id) {
-    return await fogBugzFetch({
+    const response = await fogBugzFetch({
         'cmd': commands.VIEW,
         'ixPerson': id
     });
+
+    return response.person[0];
 }
