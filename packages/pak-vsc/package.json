@@ -1,0 +1,15 @@
+{
+  "name": "pak-vsc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "Stephen M. Wilson",
+  "license": "ISC",
+  "type": "module"
+}
