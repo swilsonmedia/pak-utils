@@ -8,7 +8,7 @@ export default async function checkout(branch) {
     const output = [];
 
     const checkout = await execPromise(`git checkout -b ${branch}`);
-
+    
     output.push(checkout.stdout);
 
     if (checkout.stderr) {

@@ -16,7 +16,7 @@ export default async function setUpstream(branch) {
             throw upstream.stderr;
         }
 
-        output.push(checkout.stderr);
+        output.push(upstream.stderr);
     }
 
     return output.join('\n');

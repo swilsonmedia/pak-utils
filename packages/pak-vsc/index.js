@@ -13,17 +13,22 @@ import setUpstream from './lib/setupstream.js';
 import status from './lib/status.js';
 import switchToBranch from './lib/switchtobranch.js';
 
-export const add = add;
-export const checkout = checkout;
-export const commit = commit;
-export const deleteLocalBranch = deleteLocalBranch;
-export const deleteRemoteBranch = deleteRemoteBranch;
-export const getAuthorEmail = getAuthorEmail;
-export const getCurrentBranch = getCurrentBranch;
-export const logForAuthorEmail = logForAuthorEmail;
-export const merge = merge;
-export const pull = pull;
-export const push = push;
-export const setUpstream = setUpstream;
-export const status = status;
-export const switchToBranch = switchToBranch;
+
+process.on('uncaughtException', error => {
+    console.log(`pak-vsc command:\n"${error.cmd}"\n\nError:\n${error.stderr}`);
+    process.exit(1);
+});
+
+export { add, checkout, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, pull, push, setUpstream, status, switchToBranch }
+
+
+
+
+
+
+
+
+
+
+
+
