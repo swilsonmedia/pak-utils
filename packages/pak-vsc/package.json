@@ -1,7 +1,7 @@
 {
   "name": "pak-vsc",
   "version": "1.0.0",
-  "description": "",
+  "description": "A small subset of GIT commands",
   "main": "index.js",
   "directories": {
     "lib": "lib"

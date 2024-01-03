@@ -1,5 +1,5 @@
 {
-  "name": "bugz-api",
+  "name": "pak-bugz",
   "version": "1.0.0",
   "description": "A simple API to interact with Fogbugz",
   "main": "index.js",
