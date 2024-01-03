@@ -1,8 +1,29 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import makeVCS from './lib/vsc.js';
+import add from './lib/add.js';
+import checkout from './lib/checkout.js';
+import commit from './lib/commit.js';
+import deleteLocalBranch from './lib/deletelocalbranch.js';
+import deleteRemoteBranch from './lib/deleteremotebranch.js';
+import getAuthorEmail from './lib/getauthoremail.js';
+import getCurrentBranch from './lib/getcurrentbranch.js';
+import logForAuthorEmail from './lib/logforauthoremail.js';
+import merge from './lib/merge.js';
+import pull from './lib/pull.js';
+import push from './lib/push.js';
+import setUpstream from './lib/setupstream.js';
+import status from './lib/status.js';
+import switchToBranch from './lib/switchtobranch.js';
 
-const execPromise = promisify(exec);
-const git = makeVCS(execPromise);
-
-export default git;
+export const add = add;
+export const checkout = checkout;
+export const commit = commit;
+export const deleteLocalBranch = deleteLocalBranch;
+export const deleteRemoteBranch = deleteRemoteBranch;
+export const getAuthorEmail = getAuthorEmail;
+export const getCurrentBranch = getCurrentBranch;
+export const logForAuthorEmail = logForAuthorEmail;
+export const merge = merge;
+export const pull = pull;
+export const push = push;
+export const setUpstream = setUpstream;
+export const status = status;
+export const switchToBranch = switchToBranch;

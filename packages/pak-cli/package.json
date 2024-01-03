@@ -1,0 +1,19 @@
+{
+  "name": "pak-cli",
+  "version": "1.0.0",
+  "description": "CLI for command pak environment tasks",
+  "main": "index.js",
+  "bin": {
+    "pak": "bin/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Stephen Wilson",
+  "license": "ISC",
+  "dependencies": {
+    "yargs": "^17.7.2"
+  },
+  "type": "module"
+}

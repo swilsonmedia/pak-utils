@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "description": "A small subset of GIT commands",
   "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-  },
+  "scripts": {},
   "keywords": [],
   "author": "Stephen M. Wilson",
   "license": "ISC",
