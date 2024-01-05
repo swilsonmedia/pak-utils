@@ -12,6 +12,7 @@ import push from './lib/push.js';
 import setUpstream from './lib/setupstream.js';
 import status from './lib/status.js';
 import switchToBranch from './lib/switchtobranch.js';
+import isRepo from './lib/isrepo.js';
 
 
 process.on('uncaughtException', error => {
@@ -19,7 +20,7 @@ process.on('uncaughtException', error => {
     process.exit(1);
 });
 
-export { add, checkout, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, pull, push, setUpstream, status, switchToBranch }
+export { add, checkout, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, pull, push, setUpstream, status, switchToBranch, isRepo }
 
 
 

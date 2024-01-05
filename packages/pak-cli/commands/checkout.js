@@ -1,60 +1,59 @@
-import { checkout, pull, switchToBranch, setUpstream } from 'pak-vsc';
-import dotenv from 'dotenv';
-import createClient from 'pak-bugz';
-import inquirer from 'inquirer';
-import appRootPath from 'app-root-path';
+import { checkout, pull, switchToBranch, setUpstream, isRepo } from 'pak-vsc';
 import pkg from '../helpers/pkg.js';
 import { handleStandardError } from '../helpers/errors.js';
-import user from '../helpers/user.js';
-
-dotenv.config({ path: appRootPath.resolve('.env') });
+import { log, logError, logSuccess } from '../helpers/log.js';
+import { promptForBugSelection } from '../helpers/bug.js';
+import getBranchById from '../helpers/branch.js';
 
 export const cmd = 'checkout';
 
 export const description = 'Creates a new branch by case #';
 
 export function builder(yargs) {
-    return yargs.usage(`${pkg.binName} ${cmd}`);
+    return yargs
+        .usage(`${pkg.binName} ${cmd}`)
+        .options({
+            'v': {
+                alias: 'verbose',
+                type: 'boolean',
+                description: 'Display more logging',
+                default: false
+            }
+        })
 }
 
-export async function handler() {
+export async function handler({ verbose }) {
     try {
-        const client = await createClient({
-            token: process.env.BUGZ_TOKEN,
-            origin: process.env.BUGZ_ORIGIN,
-        });
-
-        const cases = await client.cases.list('inbox', { cols: 'sTitle' });
-
-        if (cases.count === 0) {
-            console.log('No cases found to checkout a branch for');
+        if (!await isRepo()) {
+            logError('Not a git repository (or any of the parent directories)');
             process.exit(1);
         }
 
-        const answer = await inquirer.prompt([{
-            name: 'case',
-            message: 'Select a case that would you like to create a branch for?',
-            type: 'list',
-            choices: cases.cases.map(c => `${c.ixBug}: ${c.sTitle}`)
-        }]);
+        const { ixBug: id } = await promptForBugSelection();
 
-        const id = /^(\d+):/gi.exec(answer.case)[1];
-        const username = await user();
-        const branchName = `users/${username}/fb-${id}`;
+        if (!id) {
+            logError('Prompt did not return an id');
+            process.exit(1);
+        }
+
+
+        const branchName = await getBranchById(id);
 
         const switchResponse = await switchToBranch(process.env.DEFAULT_BRANCH);
         const pullResponse = await pull();
         const checkoutResponse = await checkout(branchName);
         const upstreamResponse = await setUpstream(branchName);
 
-        console.log(switchResponse);
-        console.log('');
-        console.log(pullResponse);
-        console.log('');
-        console.log(checkoutResponse);
-        console.log('');
-        console.log(upstreamResponse);
+        if (verbose) {
+            log(switchResponse);
+        }
 
+        logSuccess(checkoutResponse);
+
+        if (verbose) {
+            log(pullResponse);
+            log(upstreamResponse);
+        }
     } catch (error) {
         handleStandardError(error);
     }

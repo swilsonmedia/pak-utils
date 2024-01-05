@@ -1,4 +1,4 @@
-import { getCurrentBranch, status, add, commit, push } from 'pak-vsc';
+import { getCurrentBranch, status, add, commit, push, isRepo } from 'pak-vsc';
 import dotenv from 'dotenv';
 import createClient from 'pak-bugz';
 import inquirer from 'inquirer';
@@ -6,6 +6,8 @@ import appRootPath from 'app-root-path';
 import pkg from '../helpers/pkg.js';
 import { handleStandardError } from '../helpers/errors.js';
 import user from '../helpers/user.js';
+import { log, logError, logSuccess } from '../helpers/log.js';
+import { addBugToMessage, getBugIdFromBranchName, isBugBranchName } from '../helpers/bug.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -17,61 +19,77 @@ export function builder(yargs) {
     return yargs
         .usage(`${pkg.binName} ${cmd}`)
         .usage(`${pkg.binName} ${cmd} -m "Message here"`)
-        .option('m', {
-            alias: 'message',
-            type: 'string',
-            description: 'Commit Message'
+        .option({
+            'm': {
+                alias: 'message',
+                type: 'string',
+                description: 'Commit Message'
+            },
+            'v': {
+                alias: 'verbose',
+                type: 'boolean',
+                description: 'Display more logging',
+                default: false
+            }
         });
 }
 
-export async function handler({ message }) {
+export async function handler({ message, verbose }) {
     try {
+        if (!await isRepo()) {
+            logError('Not a git repository (or any of the parent directories)');
+            process.exit(1);
+        }
+
         const currentStatus = await status();
         const currentBranch = await getCurrentBranch();
-        const bugzId = /fb\-(\d+)/gi.exec(currentBranch)[1];
+
         let commitMessage = message;
 
         if (/nothing\sto\scommit/gi.test(currentStatus)) {
-            console.log('No changes to commit');
+            logError('No changes to commit');
             process.exit(1);
         }
 
         if (/untracked|Changes\snot\sstaged\sfor\scommit/gi.test(currentStatus)) {
-            console.log('You have untracked or unstaged changes\n\n')
+            if (verbose) {
+                log('You have untracked or unstaged changes')
+            }
 
             const confirm = await inquirer.prompt([{
                 name: 'track',
-                message: 'Do you want to include all changes in this commit?',
+                message: 'Do you want to include unstaged changes in this commit?',
                 type: 'confirm'
             }]);
 
             if (!confirm.track && !/Changes\sto\sbe\scommitted/gi.test(currentStatus)) {
-                console.log('No staged changes to commit');
+                logError('No staged changes to commit');
                 process.exit(1);
             }
 
             if (confirm.track) {
                 await add();
             }
+        }
 
-            if (!commitMessage) {
-                console.log('');
-                const answer = await inquirer.prompt([{
-                    name: 'message',
-                    message: 'Please enter a commit message',
-                    type: 'input'
-                }]);
+        if (!commitMessage) {
+            const answer = await inquirer.prompt([{
+                name: 'message',
+                message: 'Please enter a commit message',
+                type: 'input'
+            }]);
 
-                commitMessage = answer.message;
-            }
+            commitMessage = answer.message;
+        }
+
+        if (isBugBranchName(currentBranch)) {
+            commitMessage = addBugToMessage(getBugIdFromBranchName(currentBranch), commitMessage);
         }
 
         await commit(commitMessage);
         await push();
 
-        console.log('');
-        console.log('Commit made to local and remote branch complete!');
-        console.log('');
+        logSuccess('Commit made to local and remote branch complete!');
     } catch (error) {
         handleStandardError(error);
     }

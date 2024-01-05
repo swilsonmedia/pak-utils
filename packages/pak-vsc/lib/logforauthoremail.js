@@ -5,7 +5,7 @@ export default async function logForAuthorEmail(email, max = 100) {
         throw new Error('An author email is required');
     }
 
-    const { stderr, stdout } = await execPromise(`git log -n ${max} --author=${email} --pretty=oneline`);
+    const { stderr, stdout } = await execPromise(`git log -n ${max} --author=${email.trim()} --pretty=oneline`);
 
     if (stderr) {
         throw new Error(stderr);

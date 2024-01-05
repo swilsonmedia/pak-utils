@@ -1,5 +1,7 @@
-import { status } from 'pak-vsc';
+import { isRepo, status } from 'pak-vsc';
 import pkg from '../helpers/pkg.js';
+import { log, logError } from '../helpers/log.js';
+
 
 export const cmd = 'status';
 
@@ -12,9 +14,14 @@ export function builder(yargs) {
 
 export async function handler(args) {
     try {
-        console.log(await status());
+        if (!await isRepo()) {
+            logError('Not a git repository (or any of the parent directories)');
+            process.exit(1);
+        }
+
+        log(await status())
     } catch (error) {
-        console.log(error.stderr);
+        logError(error.stderr);
         process.exit(1);
     }
 }

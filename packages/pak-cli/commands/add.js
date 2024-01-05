@@ -1,4 +1,4 @@
-import { add } from 'pak-vsc';
+import { add, isRepo } from 'pak-vsc';
 import pkg from '../helpers/pkg.js';
 
 export const cmd = 'add';
@@ -12,5 +12,10 @@ export function builder(yargs) {
 }
 
 export async function handler({ _: args }) {
+    if (!await isRepo()) {
+        logError('Not a git repository (or any of the parent directories)');
+        process.exit(1);
+    }
+
     add(args.slice(1).join(' '));
 }
