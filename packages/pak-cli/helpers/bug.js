@@ -17,7 +17,8 @@ export function addBugToMessage(bugId, message) {
     return `BugzId: ${bugId} - ${message}`;
 }
 
-export async function promptForBugSelection() {
+export async function getBugList(options = {}) {
+    const { exclude, filter } = options;
     const client = await createClient({
         token: process.env.BUGZ_TOKEN,
         origin: process.env.BUGZ_ORIGIN,
@@ -26,7 +27,28 @@ export async function promptForBugSelection() {
     const cases = await client.cases.list('inbox', { cols: 'sTitle' });
 
     if (cases.count === 0) {
-        logError('No cases found to checkout a branch for');
+        logError('No cases were found');
+        process.exit(1);
+    }
+
+    let choices = cases.cases;
+
+    if (Array.isArray(exclude)) {
+        choices = choices.filter(c => !exclude.includes(c.ixBug));
+    }
+
+    if (Array.isArray(filter)) {
+        choices = choices.filter(c => filter.includes(c.ixBug));
+    }
+
+    return choices;
+}
+
+export async function promptForBugSelection(options = {}) {
+    const choices = await getBugList(options);
+
+    if (!choices.length) {
+        logError('No cases were found');
         process.exit(1);
     }
 
@@ -34,7 +56,7 @@ export async function promptForBugSelection() {
         name: 'case',
         message: 'Select a case that would you like to create a branch for?',
         type: 'list',
-        choices: cases.cases.map(c => `${c.ixBug}: ${c.sTitle}`)
+        choices: choices.map(c => `${c.ixBug}: ${c.sTitle}`)
     }]);
 
     const id = /^(\d+):/gi.exec(answer.case)[1];

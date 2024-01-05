@@ -82,7 +82,6 @@ export async function cleanup({ branch, verbose }) {
         }
 
         logSuccess(`"${branchName}" was removed from local and remote`);
-
     } catch (error) {
         handleStandardError(error);
     }

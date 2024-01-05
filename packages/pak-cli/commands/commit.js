@@ -5,7 +5,6 @@ import inquirer from 'inquirer';
 import appRootPath from 'app-root-path';
 import pkg from '../helpers/pkg.js';
 import { handleStandardError } from '../helpers/errors.js';
-import user from '../helpers/user.js';
 import { log, logError, logSuccess } from '../helpers/log.js';
 import { addBugToMessage, getBugIdFromBranchName, isBugBranchName } from '../helpers/bug.js';
 
@@ -86,8 +85,17 @@ export async function handler({ message, verbose }) {
             commitMessage = addBugToMessage(getBugIdFromBranchName(currentBranch), commitMessage);
         }
 
-        await commit(commitMessage);
-        await push();
+        const commitResponse = await commit(commitMessage);
+
+        if (verbose) {
+            log(commitResponse);
+        }
+
+        const pushResponse = await push();
+
+        if (verbose) {
+            log(pushResponse);
+        }
 
         logSuccess('Commit made to local and remote branch complete!');
     } catch (error) {

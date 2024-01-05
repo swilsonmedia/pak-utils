@@ -1,6 +1,12 @@
-import user from './user.js';
 
-export default async function getBranchById(id) {
-    const username = await user();
-    return `users/${username}/fb-${id}`;
+function buildBranchUser(username) {
+    return `users/${username}/fb-`;
+}
+
+export function buildBranchName(username, id) {
+    return `${buildBranchUser(username)}${id}`;
+}
+
+export function isUserBranch(username, branch) {
+    return branch.includes(buildBranchUser(username));
 }

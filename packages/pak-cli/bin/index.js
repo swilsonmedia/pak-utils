@@ -9,6 +9,7 @@ import * as checkout from '../commands/checkout.js';
 import * as cleanup from '../commands/cleanup.js';
 import * as commit from '../commands/commit.js';
 import * as status from '../commands/status.js';
+import * as switchCommand from '../commands/switch.js';
 import * as mergeCommands from '../commands/merge.js';
 
 process.on('uncaughtException', (error) => {
@@ -25,5 +26,6 @@ yargs(hideBin(process.argv))
     .command(commit.cmd, commit.description, commit.builder, commit.handler)
     .command(mergeCommands.cmd, mergeCommands.description, mergeCommands.builder, mergeCommands.handler)
     .command(status.cmd, status.description, status.builder, status.handler)
+    .command(switchCommand.cmd, switchCommand.description, switchCommand.builder, switchCommand.handler)
     .demandCommand(1)
     .argv;

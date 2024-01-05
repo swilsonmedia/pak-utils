@@ -7,6 +7,7 @@ import getAuthorEmail from './lib/getauthoremail.js';
 import getCurrentBranch from './lib/getcurrentbranch.js';
 import logForAuthorEmail from './lib/logforauthoremail.js';
 import merge from './lib/merge.js';
+import listBranches from './lib/listbranches.js';
 import pull from './lib/pull.js';
 import push from './lib/push.js';
 import setUpstream from './lib/setupstream.js';
@@ -16,11 +17,15 @@ import isRepo from './lib/isrepo.js';
 
 
 process.on('uncaughtException', error => {
-    console.log(`pak-vsc command:\n"${error.cmd}"\n\nError:\n${error.stderr}`);
+    if (error.cmd) {
+        console.log(`pak-vsc command:\n"${error.cmd}"\n\nError:\n${error.stderr}`);
+    } else {
+        console.log(`pak-vsc caught error: ${error}`);
+    }
     process.exit(1);
 });
 
-export { add, checkout, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, pull, push, setUpstream, status, switchToBranch, isRepo }
+export { add, checkout, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo }
 
 
 
