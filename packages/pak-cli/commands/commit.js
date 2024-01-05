@@ -1,12 +1,12 @@
 import { getCurrentBranch, status, add, commit, push, isRepo } from 'pak-vsc';
 import dotenv from 'dotenv';
-import createClient from 'pak-bugz';
 import inquirer from 'inquirer';
 import appRootPath from 'app-root-path';
-import pkg from '../helpers/pkg.js';
-import { handleStandardError } from '../helpers/errors.js';
-import { log, logError, logSuccess } from '../helpers/log.js';
-import { addBugToMessage, getBugIdFromBranchName, isBugBranchName } from '../helpers/bug.js';
+import pkg from './helpers/pkg.js';
+import { handleStandardError } from './helpers/errors.js';
+import { log, logError, logSuccess } from './helpers/log.js';
+import { addBugToMessage } from './helpers/bug.js';
+import { getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 

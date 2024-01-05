@@ -1,12 +1,12 @@
-import { commit, getAuthorEmail, isRepo, listBranches, logForAuthorEmail, merge, pull, push, switchToBranch } from 'pak-vsc';
-import { handleStandardError } from '../helpers/errors.js';
-import { log, logError, logSuccess } from '../helpers/log.js';
-import pkg from '../helpers/pkg.js';
-import { addBugToMessage, findBugCases, getBugIdFromBranchName, isBugBranchName, promptForBugSelection } from '../helpers/bug.js';
+import { commit, getAuthorEmail, isRepo, logForAuthorEmail, merge, pull, push, switchToBranch } from 'pak-vsc';
+import { handleStandardError } from './helpers/errors.js';
+import { log, logError, logSuccess } from './helpers/log.js';
+import pkg from './helpers/pkg.js';
+import { addBugToMessage, findBugCases, getUniqueBugIdsFromBranchList, promptForBugSelection } from './helpers/bug.js';
 import inquirer from 'inquirer';
-import { buildBranchName } from '../helpers/branch.js';
+import { buildBranchName, getBranchList } from './helpers/branch.js';
 import { cleanup } from './cleanup.js';
-import user from '../helpers/user.js';
+import user from './helpers/user.js';
 
 export const cmd = 'merge';
 
@@ -38,12 +38,8 @@ export function builder(yargs) {
 }
 
 export async function handler(args) {
-    const branches = await listBranches();
-    const bugIds = branches
-        .filter(b => isBugBranchName(b))
-        .map(b => getBugIdFromBranchName(b));
-    const uniqueBugIds = [...new Set(bugIds)];
-    const chosenBug = await promptForBugSelection({ filter: uniqueBugIds });
+    const branches = await getBranchList();
+    const chosenBug = await promptForBugSelection({ filter: getUniqueBugIdsFromBranchList(branches) });
 
     await handleMerge({ ...args, bugId: chosenBug.ixBug });
 }

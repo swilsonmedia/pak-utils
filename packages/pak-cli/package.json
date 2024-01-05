@@ -2,11 +2,12 @@
   "name": "pak-cli",
   "version": "1.0.0",
   "description": "CLI for command pak environment tasks",
-  "main": "index.js",
   "bin": {
     "pak": "bin/index.js"
   },
   "scripts": {
+    "install": "echo install!!!",
+    "postinstall": "echo installed stuff!!!",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

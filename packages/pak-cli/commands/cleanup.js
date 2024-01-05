@@ -3,10 +3,12 @@ import dotenv from 'dotenv';
 import createClient from 'pak-bugz';
 import inquirer from 'inquirer';
 import appRootPath from 'app-root-path';
-import pkg from '../helpers/pkg.js';
-import { handleStandardError } from '../helpers/errors.js';
-import user from '../helpers/user.js';
-import { log, logError, logSuccess } from '../helpers/log.js';
+import pkg from './helpers/pkg.js';
+import { handleStandardError } from './helpers/errors.js';
+import user from './helpers/user.js';
+import { log, logError, logSuccess } from './helpers/log.js';
+import { buildBranchName, getBranchList } from './helpers/branch.js';
+import { getBugList, getUniqueBugIdsFromBranchList } from './helpers/bug.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -47,14 +49,10 @@ export async function cleanup({ branch, verbose }) {
         let branchName = branch;
 
         if (!branchName) {
-            const client = await createClient({
-                token: process.env.BUGZ_TOKEN,
-                origin: process.env.BUGZ_ORIGIN,
-            });
+            const branches = await getBranchList(true);
+            const choices = await getBugList({ filter: getUniqueBugIdsFromBranchList(branches) });
 
-            const cases = await client.cases.list('inbox', { cols: 'sTitle' });
-
-            if (cases.count === 0) {
+            if (!choices.length) {
                 logError('No cases were found to cleanup');
                 process.exit(1);
             }
@@ -63,13 +61,13 @@ export async function cleanup({ branch, verbose }) {
                 name: 'case',
                 message: 'Select a case that would you like to create a branch for?',
                 type: 'list',
-                choices: cases.cases.map(c => `${c.ixBug}: ${c.sTitle}`)
+                choices: choices.map(c => `${c.ixBug}: ${c.sTitle}`)
             }]);
 
             const id = /^(\d+):/gi.exec(answer.case)[1];
             const username = await user();
 
-            branchName = `users/${username}/fb-${id}`;
+            branchName = buildBranchName(username, id);
         }
 
         await switchToBranch(process.env.DEFAULT_BRANCH);

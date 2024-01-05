@@ -2,16 +2,9 @@ import createClient from 'pak-bugz';
 import inquirer from 'inquirer';
 import dotenv from 'dotenv';
 import appRootPath from 'app-root-path';
+import { getBugIdFromBranchName, isBugBranchName } from './branch.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
-
-export function getBugIdFromBranchName(branchName) {
-    return /fb\-(\d+)/gi.exec(branchName)[1] ?? '';
-}
-
-export function isBugBranchName(branchName) {
-    return /fb\-(\d+)/gi.test(branchName);
-}
 
 export function addBugToMessage(bugId, message) {
     return `BugzId: ${bugId} - ${message}`;
@@ -61,7 +54,7 @@ export async function promptForBugSelection(options = {}) {
 
     const id = /^(\d+):/gi.exec(answer.case)[1];
 
-    return cases.cases.find(c => c.ixBug === id);
+    return choices.find(c => c.ixBug === id);
 }
 
 export function findBugCases(versionControlLog, bugId) {
@@ -78,4 +71,8 @@ export function findBugCases(versionControlLog, bugId) {
                 log
             }
         });
+}
+
+export function getUniqueBugIdsFromBranchList(list) {
+    return [...new Set(list.filter(b => isBugBranchName(b)).map(b => getBugIdFromBranchName(b)))];
 }

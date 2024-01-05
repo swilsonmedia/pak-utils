@@ -1,12 +1,12 @@
-import { checkout, pull, switchToBranch, setUpstream, isRepo, listBranches } from 'pak-vsc';
-import pkg from '../helpers/pkg.js';
-import { handleStandardError } from '../helpers/errors.js';
-import { log, logError, logSuccess } from '../helpers/log.js';
-import { promptForBugSelection, isBugBranchName, getBugIdFromBranchName } from '../helpers/bug.js';
-import { buildBranchName } from '../helpers/branch.js';
+import { checkout, pull, switchToBranch, setUpstream, isRepo } from 'pak-vsc';
+import pkg from './helpers/pkg.js';
+import { handleStandardError } from './helpers/errors.js';
+import { log, logError, logSuccess } from './helpers/log.js';
+import { getUniqueBugIdsFromBranchList, promptForBugSelection } from './helpers/bug.js';
+import { buildBranchName, getBranchList } from './helpers/branch.js';
 import dotenv from 'dotenv';
 import appRootPath from 'app-root-path';
-import user from '../helpers/user.js';
+import user from './helpers/user.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -29,25 +29,21 @@ export function builder(yargs) {
 
 export async function handler({ verbose }) {
     try {
-        const branches = await listBranches(true);
-        const bugIds = branches
-            .filter(b => isBugBranchName(b))
-            .map(b => getBugIdFromBranchName(b));
-        const uniqueBugIds = [...new Set(bugIds)];        
+        const branches = await getBranchList(true);  
 
         if (!await isRepo()) {
             logError('Not a git repository (or any of the parent directories)');
             process.exit(1);
         }
 
-        const { ixBug: id } = await promptForBugSelection({ exclude: uniqueBugIds });
+        const { ixBug: id } = await promptForBugSelection({ exclude: getUniqueBugIdsFromBranchList(branches) });
 
         if (!id) {
             logError('Prompt did not return an id');
             process.exit(1);
         }
 
-        const username = user();
+        const username = await user();
         const branchName = buildBranchName(username, id);
         const switchResponse = await switchToBranch(process.env.DEFAULT_BRANCH);
         const pullResponse = await pull();

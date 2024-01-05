@@ -1,12 +1,12 @@
-import { isRepo, listBranches, switchToBranch } from 'pak-vsc';
-import pkg from '../helpers/pkg.js';
-import { getBugIdFromBranchName, getBugList, isBugBranchName } from '../helpers/bug.js';
+import { isRepo, switchToBranch } from 'pak-vsc';
+import pkg from './helpers/pkg.js';
+import { getBugList } from './helpers/bug.js';
 import dotenv from 'dotenv';
 import appRootPath from 'app-root-path';
 import inquirer from 'inquirer';
-import { log, logSuccess } from '../helpers/log.js';
-import { isUserBranch } from '../helpers/branch.js';
-import user from '../helpers/user.js';
+import { log, logSuccess } from './helpers/log.js';
+import { getBranchList, getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
+import user from './helpers/user.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -33,7 +33,7 @@ export async function handler({ verbose }) {
         process.exit(1);
     }
 
-    const branches = await getFilteredBranchList();
+    const branches = await getBranchList(true);
     const branchMap = await getBranchChoiceMap(branches);
 
     const choices = [...branchMap.keys()];
@@ -55,22 +55,6 @@ export async function handler({ verbose }) {
     logSuccess(`Switched to ${branch}`);
 }
 
-async function getFilteredBranchList() {
-    const username = await user();
-    return (await listBranches(true))
-        .filter(
-            b =>
-                !b.includes('HEAD') &&
-                (
-                    isUserBranch(username, b)
-                    || b.includes(process.env.DEFAULT_BRANCH)
-                    || (b.includes('releasetags') && isRecentReleaseTag(b))
-                )
-        )
-        .map(b => b.trim())
-        .map(b => b.replace('* ', '').replace('remotes/origin/', ''));
-}
-
 async function getBranchChoiceMap(branches) {
     const uniqueBranches = [...new Set(branches)];
     const bugToTitleMap = new Map((await getBugList()).map(bug => [bug.ixBug, bug.sTitle]));
@@ -89,21 +73,4 @@ async function getBranchChoiceMap(branches) {
     }));
 }
 
-function isRecentReleaseTag(branch) {
-    return isWithinTimeFrame(diffInDaysFromToday(findDateFromString(branch)))
-}
 
-function isWithinTimeFrame(days) {
-    return days < 45;
-}
-
-function findDateFromString(str) {
-    return /\d+\/\d+\/\d+/.exec(str)[0]
-}
-
-function diffInDaysFromToday(date) {
-    const compare = new Date(date);
-    const today = new Date();
-
-    return (today.getTime() - compare.getTime()) / (1000 * 3600 * 24);
-}
