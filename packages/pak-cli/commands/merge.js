@@ -1,4 +1,4 @@
-import { commit, getAuthorEmail, isRepo, logForAuthorEmail, merge, pull, push, switchToBranch } from 'pak-vsc';
+import { cherryPick, commit, getAuthorEmail, isRepo, logForAuthorEmail, merge, pull, push, switchToBranch } from 'pak-vsc';
 import { handleStandardError } from './helpers/errors.js';
 import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import pkg from './helpers/pkg.js';
@@ -51,6 +51,8 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
             process.exit(1);
         }
 
+        const author = await getAuthorEmail();
+
         let commitMessage = message;
         const log = makeLogger(verbose);
         const username = await user();
@@ -58,8 +60,6 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
 
         if (!commitMessage) {
             await switchToBranch(branchName);
-
-            const author = await getAuthorEmail();
             const logResults = await logForAuthorEmail(author);
             const topBugLogs = findBugCases(logResults, bugId);
 
@@ -107,8 +107,61 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
                 verbose
             });
         }
+
+        const releaseQuestion = await inquirer.prompt({
+            name: 'answer',
+            message: 'Merge for release?',
+            type: 'confirm', 
+            default: false
+        });
+
+        if (releaseQuestion.answer){
+            const branches = await getBranchList();
+            const releaseBranch = await inquirer.prompt([{
+                name: 'answer',
+                message: 'Select the release branch?',
+                type: 'list',
+                choices: branches.filter(b => b.includes('releasetags'))
+            }]);
+            
+            const mainCommits = await logForAuthorEmail(author);
+            log(await switchToBranch(releaseBranch.answer));
+            const releaseCommits = await logForAuthorEmail(author);           
+
+            const commitQuestion = await inquirer.prompt([{
+                name: 'answer',
+                message: 'Select the commit you would like to release?',
+                type: 'list',
+                choices: findUnmergedBugCommits(mainCommits, releaseCommits, bugId)
+            }]);
+
+            const commitHash = commitQuestion.answer.split(' ')[0];
+            
+            log(await cherryPick(commitHash));  
+            log(await push());
+            log(await switchToBranch(process.env.DEFAULT_BRANCH));     
+            logSuccess(`Merged ${commitHash} to ${releaseBranch.answer} for release`);
+        }
+
+        log(await switchToBranch(process.env.DEFAULT_BRANCH));        
     } catch (error) {
         handleStandardError(error);
         process.exit(1);
     }
+}
+
+function findUnmergedBugCommits(from, to, id){
+    const idSplit = ` BugzId: ${id} -`;
+    const commits = from.split('\n').filter(commit => commit.includes(idSplit)).map(commit => {
+        const parts = commit.split(idSplit);
+
+        return{
+            original: commit,
+            hash: parts[0],
+            message: parts[1]
+        };
+    });
+    const toValues = to.split('\n').filter(commit => commit.includes(idSplit)).map(commit => commit.split(idSplit)[1]);
+
+    return commits.filter(commit => !toValues.includes(commit.message)).map(commit => commit.original);
 }

@@ -3,6 +3,7 @@ import inquirer from 'inquirer';
 import dotenv from 'dotenv';
 import appRootPath from 'app-root-path';
 import { getBugIdFromBranchName, isBugBranchName } from './branch.js';
+import { logError } from './log.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
