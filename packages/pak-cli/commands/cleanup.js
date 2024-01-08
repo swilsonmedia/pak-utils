@@ -6,7 +6,7 @@ import appRootPath from 'app-root-path';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
 import user from './helpers/user.js';
-import { log, logError, logSuccess } from './helpers/log.js';
+import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import { buildBranchName, getBranchList } from './helpers/branch.js';
 import { getBugList, getUniqueBugIdsFromBranchList } from './helpers/bug.js';
 
@@ -46,6 +46,7 @@ export async function cleanup({ branch, verbose }) {
             process.exit(1);
         }
 
+        const log = makeLogger(verbose);
         let branchName = branch;
 
         if (!branchName) {
@@ -70,15 +71,9 @@ export async function cleanup({ branch, verbose }) {
             branchName = buildBranchName(username, id);
         }
 
-        await switchToBranch(process.env.DEFAULT_BRANCH);
-        const localResponse = await deleteLocalBranch(branchName);
-        const remoteResponse = await deleteRemoteBranch(branchName);
-
-        if (verbose) {
-            log(localResponse);
-            log(remoteResponse);
-        }
-
+        log(await switchToBranch(process.env.DEFAULT_BRANCH));
+        log(await deleteLocalBranch(branchName));
+        log(await deleteRemoteBranch(branchName));
         logSuccess(`"${branchName}" was removed from local and remote`);
     } catch (error) {
         handleStandardError(error);

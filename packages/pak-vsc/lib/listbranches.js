@@ -1,12 +1,5 @@
-import execPromise from './helpers/exec.js';
+import runCommand from './helpers/command.js';
 
 export default async function listBranches(includeRemote = false) {
-
-    const { stderr, stdout } = await execPromise(`git branch${includeRemote ? ' -a' : ''}`);
-
-    if (stderr) {
-        throw stderr;
-    }
-
-    return stdout.split('\n');
+    return (await runCommand(`git branch${includeRemote ? ' -a' : ''}`)).split('\n');
 }

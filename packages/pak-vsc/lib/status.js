@@ -1,11 +1,5 @@
-import execPromise from './helpers/exec.js';
+import runCommand from './helpers/command.js';
 
 export default async function status() {
-    const { stderr, stdout } = await execPromise('git status');
-
-    if (stderr) {
-        throw stderr;
-    }
-
-    return stdout;
+    return await runCommand('git status');
 }

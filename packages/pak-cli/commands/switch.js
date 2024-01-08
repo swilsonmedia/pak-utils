@@ -4,9 +4,8 @@ import { getBugList } from './helpers/bug.js';
 import dotenv from 'dotenv';
 import appRootPath from 'app-root-path';
 import inquirer from 'inquirer';
-import { log, logSuccess } from './helpers/log.js';
+import { logError, logSuccess } from './helpers/log.js';
 import { getBranchList, getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
-import user from './helpers/user.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -46,13 +45,8 @@ export async function handler({ verbose }) {
     }]);
 
     const branch = branchMap.get(answer.branch);
-    const switchResponse = await switchToBranch(branch);
 
-    if (verbose) {
-        log(switchResponse);
-    }
-
-    logSuccess(`Switched to ${branch}`);
+    logSuccess(await switchToBranch(branch));
 }
 
 async function getBranchChoiceMap(branches) {

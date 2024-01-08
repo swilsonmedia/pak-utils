@@ -1,7 +1,7 @@
 import { checkout, pull, switchToBranch, setUpstream, isRepo } from 'pak-vsc';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
-import { log, logError, logSuccess } from './helpers/log.js';
+import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import { getUniqueBugIdsFromBranchList, promptForBugSelection } from './helpers/bug.js';
 import { buildBranchName, getBranchList } from './helpers/branch.js';
 import dotenv from 'dotenv';
@@ -29,37 +29,29 @@ export function builder(yargs) {
 
 export async function handler({ verbose }) {
     try {
-        const branches = await getBranchList(true);  
-
         if (!await isRepo()) {
             logError('Not a git repository (or any of the parent directories)');
             process.exit(1);
         }
 
+        const log = makeLogger(verbose);
+        const branches = await getBranchList(true);  
         const { ixBug: id } = await promptForBugSelection({ exclude: getUniqueBugIdsFromBranchList(branches) });
+        const username = await user();
 
         if (!id) {
             logError('Prompt did not return an id');
             process.exit(1);
         }
 
-        const username = await user();
         const branchName = buildBranchName(username, id);
-        const switchResponse = await switchToBranch(process.env.DEFAULT_BRANCH);
-        const pullResponse = await pull();
-        const checkoutResponse = await checkout(branchName);
-        const upstreamResponse = await setUpstream(branchName);
 
-        if (verbose) {
-            log(switchResponse);
-        }
+        log(await switchToBranch(process.env.DEFAULT_BRANCH));        
+        log(await pull());
+        log(await checkout(branchName));
+        log(await setUpstream(branchName));
 
-        logSuccess(checkoutResponse);
-
-        if (verbose) {
-            log(pullResponse);
-            log(upstreamResponse);
-        }
+        logSuccess(`"${branchName}" was checked out`);        
     } catch (error) {
         handleStandardError(error);
     }

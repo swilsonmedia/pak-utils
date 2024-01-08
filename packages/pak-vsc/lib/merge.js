@@ -1,4 +1,4 @@
-import execPromise from './helpers/exec.js';
+import runCommand from './helpers/command.js';
 
 export default async function merge(branch, message = '', squash = false) {
     if (!branch) {
@@ -17,11 +17,5 @@ export default async function merge(branch, message = '', squash = false) {
         commandOptions.push(`-m "${message}"`);
     }
 
-    const { stderr, stdout } = await execPromise(`git merge ${commandOptions.join(' ')}`);
-
-    if (stderr) {
-        throw new Error(stderr);
-    }
-
-    return stdout;
+    return await runCommand(`git merge ${commandOptions.join(' ')}`);
 }

@@ -1,9 +1,10 @@
-import execPromise from './helpers/exec.js';
+import runCommand from './helpers/command.js';
 
 export default async function isRepo() {
-    try {
-        const { stderr } = await execPromise('git rev-parse --git-dir');
-        return !stderr; 
+    try {        
+        const response = await runCommand('git rev-parse --git-dir');
+
+        return !!response; 
     } catch (error) {
         return false;
     }

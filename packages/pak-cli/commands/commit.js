@@ -4,7 +4,7 @@ import inquirer from 'inquirer';
 import appRootPath from 'app-root-path';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
-import { log, logError, logSuccess } from './helpers/log.js';
+import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import { addBugToMessage } from './helpers/bug.js';
 import { getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
 
@@ -40,6 +40,7 @@ export async function handler({ message, verbose }) {
             process.exit(1);
         }
 
+        const log = makeLogger(verbose);
         const currentStatus = await status();
         const currentBranch = await getCurrentBranch();
 
@@ -51,9 +52,7 @@ export async function handler({ message, verbose }) {
         }
 
         if (/untracked|Changes\snot\sstaged\sfor\scommit/gi.test(currentStatus)) {
-            if (verbose) {
-                log('You have untracked or unstaged changes')
-            }
+            log('You have untracked or unstaged changes')
 
             const confirm = await inquirer.prompt([{
                 name: 'track',
@@ -67,7 +66,7 @@ export async function handler({ message, verbose }) {
             }
 
             if (confirm.track) {
-                await add();
+                log(await add());
             }
         }
 
@@ -85,17 +84,8 @@ export async function handler({ message, verbose }) {
             commitMessage = addBugToMessage(getBugIdFromBranchName(currentBranch), commitMessage);
         }
 
-        const commitResponse = await commit(commitMessage);
-
-        if (verbose) {
-            log(commitResponse);
-        }
-
-        const pushResponse = await push();
-
-        if (verbose) {
-            log(pushResponse);
-        }
+        log(await commit(commitMessage));
+        log(await push());
 
         logSuccess('Commit made to local and remote branch complete!');
     } catch (error) {

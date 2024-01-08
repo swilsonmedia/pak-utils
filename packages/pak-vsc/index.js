@@ -15,16 +15,6 @@ import status from './lib/status.js';
 import switchToBranch from './lib/switchtobranch.js';
 import isRepo from './lib/isrepo.js';
 
-
-process.on('uncaughtException', error => {
-    if (error.cmd) {
-        console.log(`pak-vsc command:\n"${error.cmd}"\n\nError:\n${error.stderr}`);
-    } else {
-        console.log(`pak-vsc caught error: ${error}`);
-    }
-    process.exit(1);
-});
-
 export { add, checkout, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo }
 
 

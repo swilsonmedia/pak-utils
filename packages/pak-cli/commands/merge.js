@@ -1,6 +1,6 @@
 import { commit, getAuthorEmail, isRepo, logForAuthorEmail, merge, pull, push, switchToBranch } from 'pak-vsc';
 import { handleStandardError } from './helpers/errors.js';
-import { log, logError, logSuccess } from './helpers/log.js';
+import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import pkg from './helpers/pkg.js';
 import { addBugToMessage, findBugCases, getUniqueBugIdsFromBranchList, promptForBugSelection } from './helpers/bug.js';
 import inquirer from 'inquirer';
@@ -52,6 +52,7 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
         }
 
         let commitMessage = message;
+        const log = makeLogger(verbose);
         const username = await user();
         const branchName = await buildBranchName(username, bugId);
 
@@ -89,55 +90,14 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
             }
         }
 
-        let switchTo = await switchToBranch(process.env.DEFAULT_BRANCH);
-
-        if (verbose) {
-            log(switchTo);
-        }
-
-        const pullResponse = await pull();
-
-        if (verbose) {
-            log(pullResponse);
-        }
-
-
-
-        switchTo = await switchToBranch(branchName);
-
-        if (verbose) {
-            log(switchTo);
-        }
-
-        const mergeFromDefault = await merge(process.env.DEFAULT_BRANCH, addBugToMessage(bugId, 'merging master to branch'), false);
-
-        if (verbose) {
-            log(mergeFromDefault);
-        }
-
-        switchTo = await switchToBranch(process.env.DEFAULT_BRANCH);
-
-        if (verbose) {
-            log(switchTo);
-        }
-
-        const mergeFromBranch = await merge(branchName, '', true);
-
-        if (verbose) {
-            log(mergeFromBranch);
-        }
-
-        const commitResponse = await commit(addBugToMessage(bugId, commitMessage));
-
-        if (verbose) {
-            log(commitResponse);
-        }
-
-        const pushResponse = await push();
-
-        if (verbose) {
-            log(pushResponse);
-        }
+        log(await switchToBranch(process.env.DEFAULT_BRANCH));
+        log(await pull())
+        log(await switchToBranch(branchName));
+        log(await merge(process.env.DEFAULT_BRANCH, addBugToMessage(bugId, 'merging master to branch'), false));
+        log(await switchToBranch(process.env.DEFAULT_BRANCH));
+        log(await merge(branchName, '', true));
+        log(await commit(addBugToMessage(bugId, commitMessage)));
+        log(await push());
 
         logSuccess(`Changes from "${branchName}" were merged to "${process.env.DEFAULT_BRANCH}"`);
 

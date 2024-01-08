@@ -1,15 +1,9 @@
-import execPromise from './helpers/exec.js';
+import runCommand from './helpers/command.js';
 
 export default async function logForAuthorEmail(email, max = 100) {
     if (!email) {
         throw new Error('An author email is required');
     }
 
-    const { stderr, stdout } = await execPromise(`git log -n ${max} --author=${email.trim()} --pretty=oneline`);
-
-    if (stderr) {
-        throw new Error(stderr);
-    }
-
-    return stdout;
+    return await runCommand(`git log -n ${max} --author=${email.trim()} --pretty=oneline`);
 }

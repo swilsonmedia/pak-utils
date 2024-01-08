@@ -1,9 +1,5 @@
-import execPromise from './helpers/exec.js';
+import runCommand from './helpers/command.js';
 
 export default async function pull() {
-    const { stderr } = await execPromise('git pull');
-
-    if (stderr) {
-        throw new Error(stderr);
-    }
+    return await runCommand('git pull');
 }

@@ -1,7 +1,5 @@
-import execPromise from './helpers/exec.js';
+import runCommand from './helpers/command.js';
 
 export default async function push() {
-    const { stdout } = await execPromise('git push');
-
-    return stdout;
+    return await runCommand('git push');
 }
