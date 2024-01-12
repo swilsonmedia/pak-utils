@@ -1,9 +1,9 @@
 import createClient from 'pak-bugz';
-import inquirer from 'inquirer';
 import dotenv from 'dotenv';
 import appRootPath from 'app-root-path';
 import { getBugIdFromBranchName, isBugBranchName } from './branch.js';
 import { logError } from './log.js';
+import { select } from './prompts.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -46,14 +46,13 @@ export async function promptForBugSelection(options = {}) {
         process.exit(1);
     }
 
-    const answer = await inquirer.prompt([{
-        name: 'case',
+    const question = await select({
         message: 'Select a case that would you like to create a branch for?',
-        type: 'list',
         choices: choices.map(c => `${c.ixBug}: ${c.sTitle}`)
-    }]);
+    });
 
-    const id = /^(\d+):/gi.exec(answer.case)[1];
+
+    const id = /^(\d+):/gi.exec(question)[1];
 
     return choices.find(c => c.ixBug === id);
 }

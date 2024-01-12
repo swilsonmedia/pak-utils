@@ -3,10 +3,10 @@ import { handleStandardError } from './helpers/errors.js';
 import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import pkg from './helpers/pkg.js';
 import { addBugToMessage, findBugCases, getUniqueBugIdsFromBranchList, promptForBugSelection } from './helpers/bug.js';
-import inquirer from 'inquirer';
 import { buildBranchName, getBranchList } from './helpers/branch.js';
 import { cleanup } from './cleanup.js';
 import user from './helpers/user.js';
+import { confirm, prompt, select } from './helpers/prompts.js';
 
 export const cmd = 'merge';
 
@@ -70,23 +70,19 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
 
             const NEW_MESSAGE = 'Enter a new message';
 
-            let question = await inquirer.prompt({
-                name: 'message',
+            const answer = await select({
                 message: 'Please select a previous comment or enter a new one.',
-                type: 'list',
                 choices: [NEW_MESSAGE].concat(topBugLogs.map(log => log.message))
             });
 
-            commitMessage = question.message;
+            commitMessage = answer;
 
             if (commitMessage === NEW_MESSAGE) {
-                question = await inquirer.prompt({
-                    name: 'message',
+                const answer = await prompt({
                     message: 'Please enter a commit message',
-                    type: 'input'
                 });
 
-                commitMessage = question.message;
+                commitMessage = answer;
             }
         }
 
@@ -108,39 +104,33 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
             });
         }
 
-        const releaseQuestion = await inquirer.prompt({
-            name: 'answer',
+        const mergeAnswer = await confirm({
             message: 'Merge to release tag?',
-            type: 'confirm', 
             default: false
         });
 
-        if (releaseQuestion.answer){
+        if (mergeAnswer) {
             const branches = await getBranchList();
-            const releaseBranch = await inquirer.prompt([{
-                name: 'answer',
+            const releaseAnswer = await select({
                 message: 'Select the release branch?',
-                type: 'list',
                 choices: branches.filter(b => b.includes('releasetags'))
-            }]);
+            });
             
             const mainCommits = await logForAuthorEmail(author);
-            log(await switchToBranch(releaseBranch.answer));
+            log(await switchToBranch(releaseAnswer));
             const releaseCommits = await logForAuthorEmail(author);           
 
-            const commitQuestion = await inquirer.prompt([{
-                name: 'answer',
+            const commitAnswer = await select({
                 message: 'Select the commit you would like to release?',
-                type: 'list',
                 choices: findUnmergedBugCommits(mainCommits, releaseCommits, bugId)
-            }]);
+            });
 
-            const commitHash = commitQuestion.answer.split(' ')[0];
+            const commitHash = commitAnswer.split(' ')[0];
             
             log(await cherryPick(commitHash));  
             log(await push());
             log(await switchToBranch(process.env.DEFAULT_BRANCH));     
-            logSuccess(`Merged ${commitHash} to ${releaseBranch.answer} for release`);
+            logSuccess(`Merged ${commitHash} to ${releaseAnswer} for release`);
         }
 
         log(await switchToBranch(process.env.DEFAULT_BRANCH));        

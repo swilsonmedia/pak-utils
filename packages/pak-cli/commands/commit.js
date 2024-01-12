@@ -1,12 +1,12 @@
 import { getCurrentBranch, status, add, commit, push, isRepo } from 'pak-vsc';
 import dotenv from 'dotenv';
-import inquirer from 'inquirer';
 import appRootPath from 'app-root-path';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
 import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import { addBugToMessage } from './helpers/bug.js';
 import { getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
+import { confirm, prompt } from './helpers/prompts.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -54,30 +54,24 @@ export async function handler({ message, verbose }) {
         if (/untracked|Changes\snot\sstaged\sfor\scommit/gi.test(currentStatus)) {
             log('You have untracked or unstaged changes')
 
-            const confirm = await inquirer.prompt([{
-                name: 'track',
-                message: 'Do you want to include unstaged changes in this commit?',
-                type: 'confirm'
-            }]);
+            const answer = await confirm({ message: 'Do you want to include unstaged changes in this commit?' });
 
-            if (!confirm.track && !/Changes\sto\sbe\scommitted/gi.test(currentStatus)) {
+            if (!answer && !/Changes\sto\sbe\scommitted/gi.test(currentStatus)) {
                 logError('No staged changes to commit');
                 process.exit(1);
             }
 
-            if (confirm.track) {
+            if (answer) {
                 log(await add());
             }
         }
 
         if (!commitMessage) {
-            const answer = await inquirer.prompt([{
-                name: 'message',
+            const answer = await prompt({
                 message: 'Please enter a commit message',
-                type: 'input'
-            }]);
+            });
 
-            commitMessage = answer.message;
+            commitMessage = answer;
         }
 
         if (isBugBranchName(currentBranch)) {

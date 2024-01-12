@@ -3,9 +3,9 @@ import pkg from './helpers/pkg.js';
 import { getBugList } from './helpers/bug.js';
 import dotenv from 'dotenv';
 import appRootPath from 'app-root-path';
-import inquirer from 'inquirer';
 import { logError, logSuccess } from './helpers/log.js';
 import { getBranchList, getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
+import { select } from './helpers/prompts.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -34,17 +34,14 @@ export async function handler({ verbose }) {
 
     const branches = await getBranchList(true);
     const branchMap = await getBranchChoiceMap(branches);
-
     const choices = [...branchMap.keys()];
 
-    const answer = await inquirer.prompt([{
-        name: 'branch',
+    const question = await select({
         message: 'Select the branch that you want to switch to',
-        type: 'list',
         choices
-    }]);
+    });
 
-    const branch = branchMap.get(answer.branch);
+    const branch = branchMap.get(question);
 
     logSuccess(await switchToBranch(branch));
 }

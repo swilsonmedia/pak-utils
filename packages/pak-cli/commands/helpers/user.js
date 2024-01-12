@@ -1,6 +1,6 @@
 import appRootPath from 'app-root-path';
 import { access, writeFile, readFile } from 'fs/promises';
-import inquirer from 'inquirer';
+import { prompt } from './prompts.js';
 
 const userConfig = appRootPath.resolve('./.pak');
 
@@ -16,11 +16,11 @@ export default async function user() {
             console.log('What username would you want to use for branch naming?\n\nex: /users/swilson/fb-123');
             console.log('');
 
-            const answer = await inquirer.prompt([{
+            const answer = await prompt({
                 name: 'username',
                 message: 'Enter a username',
                 type: 'input'
-            }]);
+            });
 
             await writeFile(userConfig, JSON.stringify({ user: answer.username }), 'utf8');
 

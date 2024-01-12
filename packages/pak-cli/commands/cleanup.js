@@ -1,7 +1,6 @@
 import { switchToBranch, deleteLocalBranch, deleteRemoteBranch, isRepo } from 'pak-vsc';
 import dotenv from 'dotenv';
 import createClient from 'pak-bugz';
-import inquirer from 'inquirer';
 import appRootPath from 'app-root-path';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
@@ -9,6 +8,7 @@ import user from './helpers/user.js';
 import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import { buildBranchName, getBranchList } from './helpers/branch.js';
 import { getBugList, getUniqueBugIdsFromBranchList } from './helpers/bug.js';
+import { select } from './helpers/prompts.js';
 
 dotenv.config({ path: appRootPath.resolve('.env') });
 
@@ -58,14 +58,12 @@ export async function cleanup({ branch, verbose }) {
                 process.exit(1);
             }
 
-            const answer = await inquirer.prompt([{
-                name: 'case',
+            const question = await select({
                 message: 'Select a case that would you like to create a branch for?',
-                type: 'list',
                 choices: choices.map(c => `${c.ixBug}: ${c.sTitle}`)
-            }]);
+            });
 
-            const id = /^(\d+):/gi.exec(answer.case)[1];
+            const id = /^(\d+):/gi.exec(question)[1];
             const username = await user();
 
             branchName = buildBranchName(username, id);
