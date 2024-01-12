@@ -110,7 +110,7 @@ export async function handleMerge({ verbose, keep, message, bugId }) {
 
         const releaseQuestion = await inquirer.prompt({
             name: 'answer',
-            message: 'Merge for release?',
+            message: 'Merge to release tag?',
             type: 'confirm', 
             default: false
         });

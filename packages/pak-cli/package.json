@@ -6,8 +6,6 @@
     "pak": "bin/index.js"
   },
   "scripts": {
-    "install": "echo install!!!",
-    "postinstall": "echo installed stuff!!!",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

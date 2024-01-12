@@ -87,7 +87,7 @@ export async function handler({ message, verbose }) {
         log(await commit(commitMessage));
         log(await push());
 
-        logSuccess('Commit made to local and remote branch complete!');
+        logSuccess('Committed changes to local and remote branch!');
     } catch (error) {
         handleStandardError(error);
     }
