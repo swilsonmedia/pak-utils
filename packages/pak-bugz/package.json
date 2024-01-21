@@ -2,7 +2,6 @@
   "name": "pak-bugz",
   "version": "1.0.0",
   "description": "A simple API to interact with Fogbugz",
-  "module": "./dist/index.js",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {

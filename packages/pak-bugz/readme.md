@@ -139,10 +139,12 @@ Example Response
 ### Parameters
 
 
+''
+
 | Property  | Type  | Description |
 |-----------|-------|-------------|
 | `id`      | string |  (required) - The case id |
-| `parameters` | object | [available properties](#available-columns) |
+| `parameters` | object | sTitle, ixProject, ixPersonAssignedTo, plugin_customfields_at_fogcreek_com_casexmilestoneh849, plugin_customfields_at_fogcreek_com_readyxforxsprintxqaj71b, plugin_customfields_at_fogcreek_com_qaxtestablek42, plugin_customfields_at_fogcreek_com_casexsummaryp32b, sEvent
 
 Example
 
@@ -168,10 +170,10 @@ Example Response
 | Property  | Type  | Description |
 |-----------|-------|-------------|
 | `filterId`   | string | The filter Id. Default is "inbox" |
-| `parameters` | object | max , cols  |
+| `parameters` | object | max, cols  |
 
 * *"max" is the maximum number of records returned. Defaults to 100 if not overridden*
-* *"cols is a comma separated list of [available properties](#available-columns)*
+* *"cols" is a comma separated list of these options: sTitle, ixProject, ixPersonAssignedTo, plugin_customfields_at_fogcreek_com_casexmilestoneh849, plugin_customfields_at_fogcreek_com_readyxforxsprintxqaj71b, plugin_customfields_at_fogcreek_com_qaxtestablek42, plugin_customfields_at_fogcreek_com_casexsummaryp32b, events, latestEvent, plugin_customfields  
 
 Example
 
@@ -206,10 +208,10 @@ Example Response
 | Property  | Type  | Description |
 |-----------|-------|-------------|
 | `search`   | string | search for string |
-| `parameters` | object | max , cols  |
+| `parameters` | object | max, cols  |
 
 * *"max" is the maximum number of records returned. Defaults to 100 if not overridden*
-* *"cols is a comma separated list of [available properties](#available-columns)*
+* *"cols" is a comma separated list of these options: sTitle, ixProject, ixPersonAssignedTo, plugin_customfields_at_fogcreek_com_casexmilestoneh849, plugin_customfields_at_fogcreek_com_readyxforxsprintxqaj71b, plugin_customfields_at_fogcreek_com_qaxtestablek42, plugin_customfields_at_fogcreek_com_casexsummaryp32b, events, latestEvent, plugin_customfields  
 
 Example
 
@@ -244,10 +246,10 @@ Example Response
 | Property  | Type  | Description |
 |-----------|-------|-------------|
 | `id`   | string | id of the bug case |
-| `parameters` | object | max , cols  |
+| `parameters` | object | max, cols  |
 
 * *"max" is the maximum number of records returned. Defaults to 100 if not overridden*
-* *"cols is a comma separated list of [available properties](#available-columns)*
+* *"cols" is a comma separated list of these options: sTitle, ixProject, ixPersonAssignedTo, plugin_customfields_at_fogcreek_com_casexmilestoneh849, plugin_customfields_at_fogcreek_com_readyxforxsprintxqaj71b, plugin_customfields_at_fogcreek_com_qaxtestablek42, plugin_customfields_at_fogcreek_com_casexsummaryp32b, events, latestEvent, plugin_customfields  
 
 Example
 
@@ -267,4 +269,5 @@ Example Response
 }
 ```
 
-[Back](../readme.md)
+
+
