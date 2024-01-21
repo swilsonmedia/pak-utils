@@ -6,8 +6,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup",
-    "watch": "tsup --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "tsup --watch"
   },
   "keywords": [
     "Fogbugz"
@@ -18,5 +17,8 @@
     "typescript": "^5.3.3",
     "tsup": "^8.0.1"
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
