@@ -18,14 +18,16 @@ export async function getBugList(options = {}) {
         origin: process.env.BUGZ_ORIGIN,
     });
 
-    const cases = await client.cases.list('inbox', { cols: 'sTitle' });
+    const cases = await client.listCases({ cols: ['sTitle'], sFilter: 'inbox' });
 
-    if (cases.count === 0) {
+    console.log(cases);
+
+    if (cases.length === 0) {
         logError('No cases were found');
         process.exit(1);
     }
 
-    let choices = cases.cases;
+    let choices = cases;
 
     if (Array.isArray(exclude)) {
         choices = choices.filter(c => !exclude.includes(c.ixBug));

@@ -1,6 +1,5 @@
 import { switchToBranch, deleteLocalBranch, deleteRemoteBranch, isRepo } from 'pak-vsc';
 import dotenv from 'dotenv';
-import createClient from 'pak-bugz';
 import appRootPath from 'app-root-path';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
