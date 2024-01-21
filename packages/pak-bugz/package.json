@@ -2,13 +2,22 @@
   "name": "pak-bugz",
   "version": "1.0.0",
   "description": "A simple API to interact with Fogbugz",
-  "main": "index.js",
-  "keywords": [],
+  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Fogbugz"
+  ],
   "author": "Stephen M. Wilson",
   "license": "ISC",
-  "type": "module",
-  "dependencies": {
-    "node-fetch": "^3.3.2",
-    "xml2js": "^0.6.2"
-  }
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "tsup": "^8.0.1"
+  },
+  "type": "module"
 }
