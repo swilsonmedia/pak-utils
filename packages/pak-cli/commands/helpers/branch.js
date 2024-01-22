@@ -19,6 +19,7 @@ export function isBugBranchName(branchName) {
 
 export async function getBranchList(includeRemote = false) {
     const username = await user();
+
     return (await listBranches(includeRemote))
         .filter(
             b =>

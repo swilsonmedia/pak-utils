@@ -39,6 +39,7 @@ export function builder(yargs) {
 
 export async function handler(args) {
     const branches = await getBranchList();
+
     const chosenBug = await promptForBugSelection({ filter: getUniqueBugIdsFromBranchList(branches) });
 
     await handleMerge({ ...args, bugId: chosenBug.ixBug });

@@ -20,8 +20,6 @@ export async function getBugList(options = {}) {
 
     const cases = await client.listCases({ cols: ['sTitle'], sFilter: 'inbox' });
 
-    console.log(cases);
-
     if (cases.length === 0) {
         logError('No cases were found');
         process.exit(1);
@@ -30,11 +28,11 @@ export async function getBugList(options = {}) {
     let choices = cases;
 
     if (Array.isArray(exclude)) {
-        choices = choices.filter(c => !exclude.includes(c.ixBug));
+        choices = choices.filter(c => !exclude.includes(c.ixBug.toString()));
     }
 
     if (Array.isArray(filter)) {
-        choices = choices.filter(c => filter.includes(c.ixBug));
+        choices = choices.filter(c => filter.includes(c.ixBug.toString()));
     }
 
     return choices;
