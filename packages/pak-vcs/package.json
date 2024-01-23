@@ -1,0 +1,25 @@
+{
+  "name": "pak-vcs",
+  "version": "1.0.0",
+  "description": "A small subset of GIT commands",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch"
+  },
+  "keywords": [],
+  "author": "Stephen M. Wilson",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@types/node": "^20.11.5"
+  }
+}

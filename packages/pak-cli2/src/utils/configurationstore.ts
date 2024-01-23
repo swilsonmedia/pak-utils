@@ -1,6 +1,4 @@
 import { access, writeFile, readFile, constants } from 'fs/promises';
-import appRootPath from 'app-root-path';
-
 
 async function hasAccess(file: string){
     try {
@@ -12,7 +10,6 @@ async function hasAccess(file: string){
 }
 
 export default async function createStore<T extends Record<string, any>>(filePath: string): Promise<StoreReturnType<T>>{
-
 
     let store: any = {};
     const canReadWrite = await hasAccess(filePath);
@@ -27,6 +24,9 @@ export default async function createStore<T extends Record<string, any>>(filePat
     return {
         get(key){
             return store[key];
+        },
+        has(key){
+            return !!store[key];
         },
         async set(key, value){
             store[key] = value;

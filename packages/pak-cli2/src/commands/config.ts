@@ -31,69 +31,50 @@ export function builder(yargs: Argv){
         });   
 }
 
-export function makeHandler(store: StoreReturnType<StoreConfig>, {select, input, confirm}: prompts.All){  
+export function makeHandler(store: StoreConfig, questions: QuestionsFunc){  
     return async (args: any) => {
-        let input = {
-            ...args
-        };        
-
-        if(Object.keys(input).length <= 2){
-            if(!await wantToContinue()){
-                return;
-            }
-
-            input = await questions();             
+        if(Object.keys(args).length > 2){
+            console.log('nope');
+            await setByInput(args);
+            return
         }
 
+        await askAndAnswer();
+    };
+
+    async function setByInput(input: any){
         if(input.username){
-            await store.set('USERNAME', input.username);
+            await store.set('username', input.username);
         }
 
         if(input.branch){
-            await store.set('DEFAULT_BRANCH', input.branch);
+            await store.set('branch', input.branch);
         }
 
         if(input.token){
-            await store.set('API_TOKEN', input.token);
+            await store.set('token', input.token);
         }
 
         if(input.origin){
-            await store.set('API_ORIGIN', input.origin);
+            await store.set('origin', input.origin);
         }
-    };
-
-    async function wantToContinue(){
-        console.log('');
-        return await confirm({message: 'Missing config entries, want to provide answers now?'});
     }
-    
-    async function questions(){
-        console.log('');
-        const username = await input({
-            message: 'What username would you like to use in GIT branches?'
-        });
 
-        console.log('');
-        const branch = await select({
-            message: 'What is the default GIT branch?',
-            choices: ['main', 'master']
-        });
+    async function askAndAnswer(){
+        if(!store.has('username')){
+            await store.set('username', await questions.username())
+        }
 
-        console.log('');
-        const token = await input({
-            message: 'What is your FogBugz API access token?'
-        });
+        if(!store.has('branch')){
+            await store.set('branch', await questions.branch())
+        }
 
-        console.log('');
-        const origin = await input({
-            message: 'What is then website origin of the FogBugz site you are using?',
-        });
+        if(!store.has('token')){
+            await store.set('token', await questions.token())
+        }
 
-        return {
-            username,
-            branch,
-            token,
-            origin
+        if(!store.has('origin')){
+            await store.set('origin', await questions.origin());
         }
     }
 }   
