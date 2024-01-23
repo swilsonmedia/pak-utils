@@ -1,0 +1,27 @@
+{
+  "name": "pak-cli2",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "pak2": "./dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.11.5",
+    "@types/yargs": "^17.0.32"
+  },
+  "scripts": {
+    "build": "tsc && npm link .",
+    "watch": "tsc -w"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "app-root-path": "^3.1.0",
+    "inquirer": "^9.2.12",
+    "pak-vsc": "^1.0.0",
+    "yargs": "^17.7.2"
+  }
+}

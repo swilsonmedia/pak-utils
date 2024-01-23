@@ -6,7 +6,7 @@
     "pak": "bin/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm link ."
   },
   "keywords": [],
   "author": "Stephen Wilson",
@@ -16,9 +16,10 @@
     "dotenv": "^16.3.1",
     "enquirer": "^2.4.1",
     "inquirer": "^9.2.12",
-    "pak-bugz": "file:../pak-bugz",
-    "pak-vsc": "file:../pak-vsc",
+    "pak-bugz": "^1.0.0",
+    "pak-vsc": "^1.0.0",
     "yargs": "^17.7.2"
   },
-  "type": "module"
+  "type": "module",
+  "main": "index.js"
 }

@@ -1,6 +1,5 @@
 import { switchToBranch, deleteLocalBranch, deleteRemoteBranch, isRepo } from 'pak-vsc';
 import dotenv from 'dotenv';
-import appRootPath from 'app-root-path';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
 import user from './helpers/user.js';
@@ -9,7 +8,7 @@ import { buildBranchName, getBranchList } from './helpers/branch.js';
 import { getBugList, getUniqueBugIdsFromBranchList } from './helpers/bug.js';
 import { select } from './helpers/prompts.js';
 
-dotenv.config({ path: appRootPath.resolve('.env') });
+dotenv.config({ path: new URL('../.env', import.meta.url) });
 
 export const cmd = 'cleanup';
 
@@ -17,8 +16,8 @@ export const description = 'Removes local and remote branches';
 
 export function builder(yargs) {
     return yargs
-        .usage(`${pkg.binName} ${cmd}`)
-        .usage(`${pkg.binName} ${cmd} -b branch/name`)
+        .usage(`${pkg().binName} ${cmd}`)
+        .usage(`${pkg().binName} ${cmd} -b branch/name`)
         .options({
             'b': {
                 alias: 'branch',

@@ -2,12 +2,11 @@ import { isRepo, switchToBranch } from 'pak-vsc';
 import pkg from './helpers/pkg.js';
 import { getBugList } from './helpers/bug.js';
 import dotenv from 'dotenv';
-import appRootPath from 'app-root-path';
 import { logError, logSuccess } from './helpers/log.js';
 import { getBranchList, getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
 import { select } from './helpers/prompts.js';
 
-dotenv.config({ path: appRootPath.resolve('.env') });
+dotenv.config({ path: new URL('../.env', import.meta.url) });
 
 export const cmd = 'switch';
 
@@ -15,7 +14,7 @@ export const description = 'Switch between branches';
 
 export function builder(yargs) {
     return yargs
-        .usage(`${pkg.binName} ${cmd}`)
+        .usage(`${pkg().binName} ${cmd}`)
         .options({
             'v': {
                 alias: 'verbose',

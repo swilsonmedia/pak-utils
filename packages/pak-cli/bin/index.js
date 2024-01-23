@@ -16,7 +16,7 @@ process.on('uncaughtException', (error) => {
 });
 
 yargs(hideBin(process.argv))
-    .scriptName(pkg.binName)
+    .scriptName(pkg().binName)
     .showHelpOnFail(true)
     .command(checkout.cmd, checkout.description, checkout.builder, checkout.handler)
     .command(cleanup.cmd, cleanup.description, cleanup.builder, cleanup.handler)

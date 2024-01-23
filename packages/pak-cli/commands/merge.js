@@ -14,8 +14,8 @@ export const description = 'Merge a case by passing a case number and commit mes
 
 export function builder(yargs) {
     return yargs
-        .usage(`${pkg.binName} ${cmd}`)
-        .usage(`${pkg.binName} ${cmd} -m "Message"`)
+        .usage(`${pkg().binName} ${cmd}`)
+        .usage(`${pkg().binName} ${cmd} -m "Message"`)
         .options({
             'm': {
                 alias: 'message',

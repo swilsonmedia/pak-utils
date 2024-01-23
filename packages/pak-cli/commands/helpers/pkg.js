@@ -1,9 +1,10 @@
 import fs from 'fs';
-import appRootPath from 'app-root-path';
 
-const pkg = JSON.parse(fs.readFileSync(appRootPath.resolve('package.json'), 'utf-8'));
+export default function () {
+    const json = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)));
 
-export default {
-    ...pkg,
-    binName: Object.keys(pkg.bin)[0]
+    return {
+        ...json,
+        binName: Object.keys(json.bin)[0]
+    }
 };

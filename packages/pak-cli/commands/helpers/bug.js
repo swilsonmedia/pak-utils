@@ -1,11 +1,10 @@
 import createClient from 'pak-bugz';
 import dotenv from 'dotenv';
-import appRootPath from 'app-root-path';
 import { getBugIdFromBranchName, isBugBranchName } from './branch.js';
 import { logError } from './log.js';
 import { select } from './prompts.js';
 
-dotenv.config({ path: appRootPath.resolve('.env') });
+dotenv.config({ path: new URL('../../.env', import.meta.url) });
 
 export function addBugToMessage(bugId, message) {
     return `BugzId: ${bugId} - ${message}`;
@@ -13,6 +12,7 @@ export function addBugToMessage(bugId, message) {
 
 export async function getBugList(options = {}) {
     const { exclude, filter } = options;
+
     const client = await createClient({
         token: process.env.BUGZ_TOKEN,
         origin: process.env.BUGZ_ORIGIN,

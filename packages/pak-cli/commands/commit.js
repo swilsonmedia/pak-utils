@@ -1,6 +1,5 @@
 import { getCurrentBranch, status, add, commit, push, isRepo } from 'pak-vsc';
 import dotenv from 'dotenv';
-import appRootPath from 'app-root-path';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
 import { logError, logSuccess, makeLogger } from './helpers/log.js';
@@ -8,7 +7,7 @@ import { addBugToMessage } from './helpers/bug.js';
 import { getBugIdFromBranchName, isBugBranchName } from './helpers/branch.js';
 import { confirm, prompt } from './helpers/prompts.js';
 
-dotenv.config({ path: appRootPath.resolve('.env') });
+dotenv.config({ path: new URL('../.env', import.meta.url) });
 
 export const cmd = 'commit';
 
@@ -16,8 +15,8 @@ export const description = 'Commit change to local and remote';
 
 export function builder(yargs) {
     return yargs
-        .usage(`${pkg.binName} ${cmd}`)
-        .usage(`${pkg.binName} ${cmd} -m "Message here"`)
+        .usage(`${pkg().binName} ${cmd}`)
+        .usage(`${pkg().binName} ${cmd} -m "Message here"`)
         .option({
             'm': {
                 alias: 'message',

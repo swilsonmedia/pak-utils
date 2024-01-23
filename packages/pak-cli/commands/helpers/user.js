@@ -1,8 +1,7 @@
-import appRootPath from 'app-root-path';
 import { access, writeFile, readFile } from 'fs/promises';
 import { prompt } from './prompts.js';
 
-const userConfig = appRootPath.resolve('./.pak');
+const userConfig = new URL('../../.pak', import.meta.url);
 
 export default async function user() {
     return new Promise(async (res, rej) => {

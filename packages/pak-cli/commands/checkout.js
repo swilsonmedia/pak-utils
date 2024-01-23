@@ -5,10 +5,9 @@ import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import { getUniqueBugIdsFromBranchList, promptForBugSelection } from './helpers/bug.js';
 import { buildBranchName, getBranchList } from './helpers/branch.js';
 import dotenv from 'dotenv';
-import appRootPath from 'app-root-path';
 import user from './helpers/user.js';
 
-dotenv.config({ path: appRootPath.resolve('.env') });
+dotenv.config({ path: new URL('../.env', import.meta.url) });
 
 export const cmd = 'checkout';
 
@@ -16,7 +15,7 @@ export const description = 'Creates a new branch by case #';
 
 export function builder(yargs) {
     return yargs
-        .usage(`${pkg.binName} ${cmd}`)
+        .usage(`${pkg().binName} ${cmd}`)
         .options({
             'v': {
                 alias: 'verbose',
@@ -36,6 +35,13 @@ export async function handler({ verbose }) {
 
         const log = makeLogger(verbose);
         const branches = await getBranchList(true);  
+
+        console.log(getUniqueBugIdsFromBranchList(branches));
+        console.log(await promptForBugSelection({ exclude: getUniqueBugIdsFromBranchList(branches) }));
+
+        return;
+
+
         const { ixBug: id } = await promptForBugSelection({ exclude: getUniqueBugIdsFromBranchList(branches) });
         const username = await user();
 
