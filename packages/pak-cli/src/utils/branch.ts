@@ -6,10 +6,6 @@ export function buildBranchName(username: string, id: number | string) {
     return `${buildBranchUser(username)}${id}`;
 }
 
-export function isUserBranch(username: string, branch: string) {
-    return branch.includes(buildBranchUser(username));
-}
-
 export function isRecentReleaseTag(branch: string) {
     return isWithinTimeFrame(diffInDaysFromToday(findDateFromString(branch)))
 }
@@ -30,13 +26,13 @@ export function findDateFromString(str: string) {
     return Array.isArray(results) ? results[0] : undefined; 
 }
 
-export async function getBranches(username: string, defaultBranch: string, branches: string[]){
+export function getBranches(username: string, defaultBranch: string, branches: string[]){
     return [...new Set(branches
         .filter(
             b =>
                 !b.includes('HEAD') &&
                 (
-                    isUserBranch(username, b)
+                    b.includes(buildBranchUser(username))
                     || b.includes(defaultBranch)
                     || (b.includes('releasetags') && isRecentReleaseTag(b))
                 )
@@ -53,3 +49,4 @@ export function getBugIdFromBranchName(branchName: string) {
 export function isBugBranchName(branchName: string) {
     return /fb\-(\d+)/gi.test(branchName);
 }
+

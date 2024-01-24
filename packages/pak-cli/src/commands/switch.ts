@@ -4,8 +4,7 @@ import * as branch from "../utils/branch.js";
 import createClient from "pak-bugz";
 
 interface Handler {
-    store: StoreConfig, 
-    questions: QuestionsFunc,
+    userSettings: StoreConfigProps,
     select: prompts.SelectPrompt,
     vcs: typeof vcs,
     branch: typeof branch,
@@ -30,8 +29,7 @@ export function builder(yargs: Argv) {
 }
 
 export function makeHandler({
-        store, 
-        questions, 
+        userSettings,
         select,
         vcs,
         branch,
@@ -44,35 +42,13 @@ export function makeHandler({
             process.exit(1);
         }
 
-        const config = {
-            username: store.get('username'),
-            branch: store.get('branch'),
-            token: store.get('token'),
-            origin: store.get('origin')
-        };
-
-        
-        const objectKeys = <Obj extends object>(obj: Obj): (keyof Obj)[] => {
-            return Object.keys(obj) as (keyof Obj)[];
-        }
-        
-        const configKeys = objectKeys(config);
-
-        for(const key of configKeys){
-            if(!config[key] && key in questions){
-                const value = await questions[key]();
-                config[key] = value;
-                await store.set(key, value);
-            }
-        }
-
         const client = createClient({
-            token: config.token,
-            origin: config.origin
+            token: userSettings.token,
+            origin: userSettings.origin
         });
 
         const cases = await client.listCases({cols: ['sTitle']});
-        const branches = await branch.getBranches(config.username, config.branch, await vcs.listBranches(true));
+        const branches = await branch.getBranches(userSettings.username, userSettings.branch, await vcs.listBranches(true));
         const casesMap = new Map(cases.map((bug: any )=> [bug.ixBug, bug.sTitle]));
         const choices = branches.map(b => {
             let key = b;

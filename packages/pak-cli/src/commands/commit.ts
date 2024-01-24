@@ -4,8 +4,6 @@ import * as branch from '../utils/branch.js';
 import createClient from 'pak-bugz';
 
 interface Handler {
-    store: StoreConfig, 
-    questions: QuestionsFunc,
     confirm: prompts.ConfirmPrompt,
     input: prompts.InputPrompt,
     vcs: typeof vcs,
@@ -31,13 +29,10 @@ export function builder(yargs: Argv) {
 }
 
 export function makeHandler({
-        store, 
-        questions, 
         confirm,
         input,
         vcs,
-        branch,
-        createClient
+        branch
     }: Handler
 ){
     return async ({ verbose }: Arguments) => {
@@ -55,8 +50,6 @@ export function makeHandler({
             console.error('No changes to commit');
             process.exit(1);
         }
-
-
 
         if (/untracked|Changes\snot\sstaged\sfor\scommit/gi.test(currentStatus)) {
             log('You have untracked or unstaged changes')

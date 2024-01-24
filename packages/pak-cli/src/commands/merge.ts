@@ -4,12 +4,12 @@ import * as branch from '../utils/branch.js';
 import createClient from 'pak-bugz';
 
 interface Handler {
-    store: StoreConfig, 
-    questions: QuestionsFunc,
+    userSettings: StoreConfigProps,
     prompts: prompts.All,
     vcs: typeof vcs,
     branch: typeof branch,
-    createClient: typeof createClient
+    createClient: typeof createClient,
+    cleanup: (branchName: string, branches: string[], verbose: boolean) => void
 }
 
 export const cmd = 'merge';
@@ -30,12 +30,12 @@ export function builder(yargs: Argv) {
 }
 
 export function makeHandler({
-        store, 
-        questions, 
+        userSettings,
         prompts,
         vcs,
         branch,
-        createClient
+        createClient,
+        cleanup
     }: Handler
 ){
     return async ({ verbose }: Arguments) => {
@@ -44,39 +44,18 @@ export function makeHandler({
             process.exit(1);
         }
 
-        const log = logger(!!verbose);
-
-        const config = {
-            username: store.get('username'),
-            branch: store.get('branch'),
-            token: store.get('token'),
-            origin: store.get('origin')
-        };
-        
-        const objectKeys = <Obj extends object>(obj: Obj): (keyof Obj)[] => {
-            return Object.keys(obj) as (keyof Obj)[];
-        }
-        
-        const configKeys = objectKeys(config);
-
-        for(const key of configKeys){
-            if(!config[key] && key in questions){
-                const value = await questions[key]();
-                config[key] = value;
-                await store.set(key, value);
-            }
-        }
+        const log = logger(!!verbose);       
 
         const author = await vcs.getAuthorEmail();
         
-        const branches = await branch.getBranches(config.username, config.branch, await vcs.listBranches(true)); 
+        const branches = await branch.getBranches(userSettings.username, userSettings.branch, await vcs.listBranches(true)); 
         const existingCaseIds = branches
                             .filter(b => branch.isBugBranchName(b))
                             .map(b => branch.getBugIdFromBranchName(b));
 
         const client = createClient({
-            token: config.token,
-            origin: config.origin
+            token: userSettings.token,
+            origin: userSettings.origin
         });
 
         const casesList = await client.listCases({cols: ['sTitle']});
@@ -95,7 +74,7 @@ export function makeHandler({
             }))
         });
 
-        const branchName = branch.buildBranchName(config.username, bugId);
+        const branchName = branch.buildBranchName(userSettings.username, bugId);
 
         const logResults = await vcs.logForAuthorEmail(author);
         const topBugLogs = findBugCases(logResults, bugId);
@@ -122,22 +101,54 @@ export function makeHandler({
             commitMessage = answer;
         }
 
-        log(await vcs.switchToBranch(config.branch));
+        log(await vcs.switchToBranch(userSettings.branch));
         log(await vcs.pull())
         log(await vcs.switchToBranch(branchName));
-        log(await vcs.merge(config.branch, buildCommitMessage(bugId, 'merging master to branch'), false));
-        log(await vcs.switchToBranch(config.branch));
+        log(await vcs.merge(userSettings.branch, buildCommitMessage(bugId, 'merging master to branch'), false));
+        log(await vcs.switchToBranch(userSettings.branch));
         log(await vcs.merge(branchName, '', true));
         log(await vcs.commit(buildCommitMessage(bugId, commitMessage)));
         log(await vcs.push());
 
-        await cleanup({
-            branch: branchName,
-            verbose
-        });
-      
+        console.log(`Changes from "${branchName}" were merged to "${userSettings.branch}"`);
+        console.log('');
 
-        console.log(`Changes from "${branchName}" were merged to "${config.branch}"`);
+        await cleanup(branchName, branches, !!verbose);
+
+        const mergeAnswer = await prompts.confirm({
+            message: 'Merge to release tag?',
+            default: false
+        });
+
+        if (mergeAnswer) {
+            const releaseAnswer = await prompts.select({
+                message: 'Select the release branch?',
+                choices: branches.filter(b => b.includes('releasetags'))
+            });
+            
+            const mainCommits = await vcs.logForAuthorEmail(author);
+            
+            log(await vcs.switchToBranch(releaseAnswer));
+            
+            const releaseCommits = await vcs.logForAuthorEmail(author);           
+
+            const commitAnswer = await prompts.select({
+                message: 'Select the commit you would like to release?',
+                choices: findUnmergedBugCommits(mainCommits, releaseCommits, bugId)
+            });
+
+            const commitHash = commitAnswer.split(' ')[0];
+            
+            log(await vcs.cherryPick(commitHash));  
+            log(await vcs.push());
+            log(await vcs.switchToBranch(userSettings.branch));     
+            
+            console.log('');
+            console.log(`Merged ${commitHash} to ${releaseAnswer} for release`);
+            console.log('');
+        }
+
+        log(await vcs.switchToBranch(userSettings.branch));  
     }
 
     function logger(verbose: boolean){
@@ -168,6 +179,22 @@ export function makeHandler({
                     log
                 }
             });
+    }
+
+    function findUnmergedBugCommits(from: string, to: string, id: string){
+        const idSplit = ` BugzId: ${id} -`;
+        const commits = from.split('\n').filter(commit => commit.includes(idSplit)).map(commit => {
+            const parts = commit.split(idSplit);
+
+            return{
+                original: commit,
+                hash: parts[0],
+                message: parts[1]
+            };
+        });
+        const toValues = to.split('\n').filter(commit => commit.includes(idSplit)).map(commit => commit.split(idSplit)[1]);
+
+        return commits.filter(commit => !toValues.includes(commit.message)).map(commit => commit.original);
     }
 }
 

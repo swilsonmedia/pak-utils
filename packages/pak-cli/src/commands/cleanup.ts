@@ -4,41 +4,39 @@ import * as branch from '../utils/branch.js';
 import createClient from 'pak-bugz';
 
 interface Handler {
-    store: StoreConfig, 
-    questions: QuestionsFunc,
+    userSettings: StoreConfigProps,
     select: prompts.SelectPrompt,
     vcs: typeof vcs,
     branch: typeof branch,
     createClient: typeof createClient
 }
 
-export const cmd = 'cleanup';
-
-export const description = 'Delete old branches from local and remote';
-
-export function builder(yargs: Argv) {
-    yargs
-        .usage(`pak ${cmd}`)
-        .options({
-            'v': {
-                alias: 'verbose',
-                type: 'boolean',
-                description: 'Display more logging',
-                default: false
-            }
-        })
-}
-
-export function makeHandler({
-        store, 
-        questions, 
+export default function makeCleanUpCommand({
+        userSettings,
         select,
         vcs,
         branch,
         createClient
     }: Handler
 ){
-    return async ({ verbose }: Arguments) => {
+    const cmd = 'cleanup';
+
+    const description = 'Delete old branches from local and remote';
+
+    function builder(yargs: Argv) {
+        yargs
+            .usage(`pak ${cmd}`)
+            .options({
+                'v': {
+                    alias: 'verbose',
+                    type: 'boolean',
+                    description: 'Display more logging',
+                    default: false
+                }
+            });
+    }
+
+    async function handler({ verbose }: Arguments){
         if (!await vcs.isRepo()) {
             console.error('Not a git repository (or any of the parent directories)');
             process.exit(1);
@@ -46,34 +44,12 @@ export function makeHandler({
 
         const log = logger(!!verbose);
 
-        const config = {
-            username: store.get('username'),
-            branch: store.get('branch'),
-            token: store.get('token'),
-            origin: store.get('origin')
-        };
-        
-        const objectKeys = <Obj extends object>(obj: Obj): (keyof Obj)[] => {
-            return Object.keys(obj) as (keyof Obj)[];
-        }
-        
-        const configKeys = objectKeys(config);
 
-        for(const key of configKeys){
-            if(!config[key] && key in questions){
-                const value = await questions[key]();
-                config[key] = value;
-                await store.set(key, value);
-            }
-        }
-
-        const branches = await branch.getBranches(config.username, config.branch, await vcs.listBranches(true));
-
- 
+        const branches = await branch.getBranches(userSettings.username, userSettings.branch, await vcs.listBranches(true));
 
         const client = createClient({
-            token: config.token,
-            origin: config.origin
+            token: userSettings.token,
+            origin: userSettings.origin
         });
 
         const casesList = await client.listCases({cols: ['sTitle']});
@@ -83,7 +59,7 @@ export function makeHandler({
             process.exit(1);
         }
 
-        const branchesNoDefault = branches.filter(b => b !== config.branch);
+        const branchesNoDefault = branches.filter(b => b !== userSettings.branch);
         const remoteBranches = branchesNoDefault.filter(b => b.includes('remotes/origin'));
         const localBranches = branchesNoDefault.filter(b => !b.includes('remotes/origin'));
         const existingCaseIds = branches.map(b => branch.getBugIdFromBranchName(b));
@@ -102,20 +78,41 @@ export function makeHandler({
             }))
         });
 
-        const branchName = branch.buildBranchName(config.username, chosenCaseId);
+        const branchName = branch.buildBranchName(userSettings.username, chosenCaseId);
 
-        log(await vcs.switchToBranch(config.branch));
+        await cleanup(branchName, branches, !!verbose);
+    }
 
-        if(localBranches.find(b => b.includes(branchName))){
-            log(await vcs.deleteLocalBranch(branchName));
+    async function cleanup(branchName: string, branches: string[], verbose=false){
+        const verboseLogger = logger(verbose);
+        const remoTeStringMatch = 'remotes/origin';
+        const isLocal = branches
+                            .filter(b => !b.includes(remoTeStringMatch))
+                            .find(b => b.includes(branchName));
+        const isRemote = branches
+                            .filter(b => b.includes(remoTeStringMatch))
+                            .find(b => b.includes(branchName));
+        
+        verboseLogger(await vcs.switchToBranch(userSettings.branch));
+
+        if(isLocal){
+            verboseLogger(await vcs.deleteLocalBranch(branchName));
             console.log(`"${branchName}" was removed from local`);
         }
         
-        if(remoteBranches.find(b => b.includes(branchName))){
-            log(await vcs.deleteRemoteBranch(branchName));
+        if(isRemote){
+            verboseLogger(await vcs.deleteRemoteBranch(branchName));
             console.log(`"${branchName}" was removed from remote`);
         }
     }
+
+    return {
+        cmd,
+        description,
+        builder,
+        handler,
+        cleanup
+    }; 
 
     function logger(verbose: boolean){
         return (input: string): void => {
