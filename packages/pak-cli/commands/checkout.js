@@ -1,4 +1,4 @@
-import { checkout, pull, switchToBranch, setUpstream, isRepo } from 'pak-vsc';
+import { checkout, pull, switchToBranch, setUpstream, isRepo } from 'pak-vcs';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';
 import { logError, logSuccess, makeLogger } from './helpers/log.js';
@@ -39,7 +39,6 @@ export async function handler({ verbose }) {
         console.log(getUniqueBugIdsFromBranchList(branches));
         console.log(await promptForBugSelection({ exclude: getUniqueBugIdsFromBranchList(branches) }));
 
-        return;
 
 
         const { ixBug: id } = await promptForBugSelection({ exclude: getUniqueBugIdsFromBranchList(branches) });

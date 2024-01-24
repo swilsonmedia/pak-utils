@@ -1,4 +1,4 @@
-import { isRepo, switchToBranch } from 'pak-vsc';
+import { isRepo, switchToBranch } from 'pak-vcs';
 import pkg from './helpers/pkg.js';
 import { getBugList } from './helpers/bug.js';
 import dotenv from 'dotenv';

@@ -1,4 +1,4 @@
-import { switchToBranch, deleteLocalBranch, deleteRemoteBranch, isRepo } from 'pak-vsc';
+import { switchToBranch, deleteLocalBranch, deleteRemoteBranch, isRepo } from '../../pak-vcs/dist/index.js';
 import dotenv from 'dotenv';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';

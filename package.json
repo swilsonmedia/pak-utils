@@ -10,7 +10,7 @@
   "workspaces": [
     "packages/pak-bugz",
     "packages/pak-cli",
-    "packages/pak-vsc",
+    "packages/pak-vcs",
     "packages/pak-cli2"
   ]
 }

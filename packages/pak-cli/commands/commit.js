@@ -1,4 +1,4 @@
-import { getCurrentBranch, status, add, commit, push, isRepo } from 'pak-vsc';
+import { getCurrentBranch, status, add, commit, push, isRepo } from 'pak-vcs';
 import dotenv from 'dotenv';
 import pkg from './helpers/pkg.js';
 import { handleStandardError } from './helpers/errors.js';

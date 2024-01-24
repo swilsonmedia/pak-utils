@@ -1,4 +1,4 @@
-import { listBranches } from 'pak-vsc';
+import { listBranches } from '../../../pak-vcs/dist/index.js';
 import user from './user.js';
 
 function buildBranchUser(username) {

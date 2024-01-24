@@ -1,4 +1,4 @@
-import { cherryPick, commit, getAuthorEmail, isRepo, logForAuthorEmail, merge, pull, push, switchToBranch } from 'pak-vsc';
+import { cherryPick, commit, getAuthorEmail, isRepo, logForAuthorEmail, merge, pull, push, switchToBranch } from '../../pak-vcs/dist/index.js';
 import { handleStandardError } from './helpers/errors.js';
 import { logError, logSuccess, makeLogger } from './helpers/log.js';
 import pkg from './helpers/pkg.js';
