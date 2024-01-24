@@ -18,14 +18,3 @@ import isRepo from './lib/isrepo.js';
 
 export { add, checkout, cherryPick, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo }
 
-
-
-
-
-
-
-
-
-
-
-

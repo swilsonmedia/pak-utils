@@ -1,5 +1,16 @@
 {
-  "dependencies": {
-    "chalk": "^5.3.0"
-  }
+  "name": "pak-utils",
+  "version": "1.0.0",
+  "description": "A collection of workplace utilities",
+  "author": "Stephen Wilson",
+  "license": "ISC",
+  "scripts": {
+    "build": "npm run build -ws"
+  },
+  "workspaces": [
+    "packages/pak-bugz",
+    "packages/pak-cli",
+    "packages/pak-vcs",
+    "packages/pak-cli2"
+  ]
 }
