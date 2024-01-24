@@ -1,14 +1,12 @@
-import { Argv, Arguments} from 'yargs';
-import * as vcs from '../../../pak-vcs/dist/index.js';
-import * as branch from '../utils/branch.js';
-import createClient from 'pak-bugz';
+import { Argv } from 'yargs';
+import {BranchUtils, ConfirmPrompt, BugzClient, InputPrompt, VCS, MiddlewareHandlerArguments} from '../types.js';
 
 interface Handler {
-    confirm: prompts.ConfirmPrompt,
-    input: prompts.InputPrompt,
-    vcs: typeof vcs,
-    branch: typeof branch,
-    createClient: typeof createClient
+    confirm: ConfirmPrompt,
+    input: InputPrompt,
+    vcs: VCS,
+    branch: BranchUtils,
+    bugzClient: BugzClient
 }
 
 export const cmd = 'commit';
@@ -35,7 +33,7 @@ export function makeHandler({
         branch
     }: Handler
 ){
-    return async ({ verbose }: Arguments) => {
+    return async ({ verbose }: MiddlewareHandlerArguments) => {
         if (!await vcs.isRepo()) {
             console.error('Not a git repository (or any of the parent directories)');
             process.exit(1);

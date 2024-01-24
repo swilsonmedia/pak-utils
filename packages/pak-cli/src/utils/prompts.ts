@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
+import {GenericPromptParams, SelectPromptParams} from "../types.js";
 
-export async function select({ message, choices }: prompts.SelectPromptParams): Promise<string> {
+export async function select({ message, choices }: SelectPromptParams): Promise<string> {
     const { answer } = await inquirer.prompt({
         name: 'answer',
         type: 'list',
@@ -11,7 +12,7 @@ export async function select({ message, choices }: prompts.SelectPromptParams): 
     return answer;
 }
 
-export async function input({ message, default: defaultValue }: prompts.GenericPromptParams): Promise<string> {
+export async function input({ message, default: defaultValue }: GenericPromptParams): Promise<string> {
     const { answer } = await inquirer.prompt({
         name: 'answer',
         message,
@@ -22,7 +23,7 @@ export async function input({ message, default: defaultValue }: prompts.GenericP
     return answer;
 }
 
-export async function confirm({ message, default: defaultValue }: prompts.GenericPromptParams): Promise<string> {
+export async function confirm({ message, default: defaultValue }: GenericPromptParams): Promise<string> {
     const { answer } = await inquirer.prompt({
         name: 'answer',
         message,

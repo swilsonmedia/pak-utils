@@ -1,14 +1,11 @@
-import { Argv, Arguments} from "yargs";
-import * as vcs from "../../../pak-vcs/dist/index.js";
-import * as branch from "../utils/branch.js";
-import createClient from "pak-bugz";
+import { Argv } from 'yargs';
+import { BranchUtils, BugzClient, MiddlewareHandlerArguments, SelectPrompt, StoreConfigProps, VCS } from '../types.js';
 
 interface Handler {
-    userSettings: StoreConfigProps,
-    select: prompts.SelectPrompt,
-    vcs: typeof vcs,
-    branch: typeof branch,
-    createClient: typeof createClient
+    select: SelectPrompt,
+    vcs: VCS,
+    branch: BranchUtils,
+    bugzClient: BugzClient
 }
 
 export const cmd = 'switch';
@@ -27,22 +24,19 @@ export function builder(yargs: Argv) {
             }
         });
 }
-
+interface US {
+    userSettings: StoreConfigProps, 
+    verbose: boolean
+}
 export function makeHandler({
-        userSettings,
         select,
         vcs,
         branch,
-        createClient
+        bugzClient
     }: Handler
 ){
-    return async ({ verbose }: Arguments) => {
-        if (!await vcs.isRepo()) {
-            console.error('Not a git repository (or any of the parent directories)');
-            process.exit(1);
-        }
-
-        const client = createClient({
+    return async ({ verbose, userSettings }:  MiddlewareHandlerArguments) => {
+        const client = bugzClient({
             token: userSettings.token,
             origin: userSettings.origin
         });

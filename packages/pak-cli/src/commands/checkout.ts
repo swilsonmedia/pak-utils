@@ -1,14 +1,11 @@
-import { Argv, Arguments} from 'yargs';
-import * as vcs from '../../../pak-vcs/dist/index.js';
-import * as branch from '../utils/branch.js';
-import createClient from 'pak-bugz';
+import { Argv } from 'yargs';
+import {BranchUtils, BugzClient, MiddlewareHandlerArguments, SelectPrompt, VCS} from '../types.js';
 
 interface Handler {
-    userSettings: StoreConfigProps,
-    select: prompts.SelectPrompt,
-    vcs: typeof vcs,
-    branch: typeof branch,
-    createClient: typeof createClient
+    select: SelectPrompt,
+    vcs: VCS,
+    branch: BranchUtils,
+    bugzClient: BugzClient
 }
 
 export const cmd = 'checkout';
@@ -29,26 +26,20 @@ export function builder(yargs: Argv) {
 }
 
 export function makeHandler({
-        userSettings,
         select,
         vcs,
         branch,
-        createClient
+        bugzClient
     }: Handler
 ){
-    return async ({ verbose }: Arguments) => {
-        if (!await vcs.isRepo()) {
-            console.error('Not a git repository (or any of the parent directories)');
-            process.exit(1);
-        }
-
+    return async ({ verbose, userSettings }: MiddlewareHandlerArguments) => {
         const log = logger(!!verbose);        
         const branches = await branch.getBranches(userSettings.username, userSettings.branch, await vcs.listBranches(true)); 
         const existingCaseIds = branches
                                     .filter(b => branch.isBugBranchName(b))
                                     .map(b => branch.getBugIdFromBranchName(b));
 
-        const client = createClient({
+        const client = bugzClient({
             token: userSettings.token,
             origin: userSettings.origin
         });

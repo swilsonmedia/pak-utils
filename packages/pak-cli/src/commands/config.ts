@@ -1,4 +1,5 @@
-import { Argv } from "yargs";
+import { ArgumentsCamelCase, Argv } from "yargs";
+import {QuestionsFunc, StoreConfig} from "../types.js";
 
 export const cmd = 'config'
 
@@ -32,9 +33,8 @@ export function builder(yargs: Argv){
 }
 
 export function makeHandler(store: StoreConfig, questions: QuestionsFunc){  
-    return async (args: any) => {
+    return async (args: ArgumentsCamelCase) => {
         if(Object.keys(args).length > 2){
-            console.log('nope');
             await setByInput(args);
             return
         }

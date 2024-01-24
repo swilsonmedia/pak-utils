@@ -1,22 +1,18 @@
-import { Argv, Arguments} from 'yargs';
-import * as vcs from '../../../pak-vcs/dist/index.js';
-import * as branch from '../utils/branch.js';
-import createClient from 'pak-bugz';
+import { Argv } from 'yargs';
+import {BranchUtils, CleanUpProps, BugzClient, SelectPrompt, VCS, MiddlewareHandlerArguments} from '../types.js';
 
 interface Handler {
-    userSettings: StoreConfigProps,
-    select: prompts.SelectPrompt,
-    vcs: typeof vcs,
-    branch: typeof branch,
-    createClient: typeof createClient
+    select: SelectPrompt,
+    vcs: VCS,
+    branch: BranchUtils,
+    bugzClient: BugzClient
 }
 
 export default function makeCleanUpCommand({
-        userSettings,
         select,
         vcs,
         branch,
-        createClient
+        bugzClient
     }: Handler
 ){
     const cmd = 'cleanup';
@@ -36,18 +32,12 @@ export default function makeCleanUpCommand({
             });
     }
 
-    async function handler({ verbose }: Arguments){
-        if (!await vcs.isRepo()) {
-            console.error('Not a git repository (or any of the parent directories)');
-            process.exit(1);
-        }
-
+    async function handler({ verbose, userSettings }: MiddlewareHandlerArguments){
         const log = logger(!!verbose);
-
 
         const branches = await branch.getBranches(userSettings.username, userSettings.branch, await vcs.listBranches(true));
 
-        const client = createClient({
+        const client = bugzClient({
             token: userSettings.token,
             origin: userSettings.origin
         });
@@ -80,10 +70,20 @@ export default function makeCleanUpCommand({
 
         const branchName = branch.buildBranchName(userSettings.username, chosenCaseId);
 
-        await cleanup(branchName, branches, !!verbose);
+        await cleanup({
+            branchName, 
+            branches, 
+            defaultBranch: userSettings.branch,
+            verbose: !!verbose
+        });
     }
 
-    async function cleanup(branchName: string, branches: string[], verbose=false){
+    async function cleanup({
+        branchName, 
+        branches, 
+        defaultBranch,
+        verbose
+    }: CleanUpProps){
         const verboseLogger = logger(verbose);
         const remoTeStringMatch = 'remotes/origin';
         const isLocal = branches
@@ -93,7 +93,7 @@ export default function makeCleanUpCommand({
                             .filter(b => b.includes(remoTeStringMatch))
                             .find(b => b.includes(branchName));
         
-        verboseLogger(await vcs.switchToBranch(userSettings.branch));
+        verboseLogger(await vcs.switchToBranch(defaultBranch));
 
         if(isLocal){
             verboseLogger(await vcs.deleteLocalBranch(branchName));

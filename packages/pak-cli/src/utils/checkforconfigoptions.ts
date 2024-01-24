@@ -1,3 +1,5 @@
+import {QuestionsFunc, StoreConfig} from "../types.js";
+
 export default async function checkForConfigOptions(store: StoreConfig, questions: QuestionsFunc){
     const config = {
         username: store.get('username'),

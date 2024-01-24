@@ -1,4 +1,5 @@
 import { access, writeFile, readFile, constants } from 'fs/promises';
+import {StoreReturnType} from '../types.js';
 
 async function hasAccess(file: string){
     try {

@@ -1,5 +1,5 @@
 {
-  "name": "pak-cli2",
+  "name": "pak-cli",
   "version": "1.0.0",
   "description": "",
   "bin": {
@@ -21,6 +21,7 @@
   "dependencies": {
     "app-root-path": "^3.1.0",
     "inquirer": "^9.2.12",
+    "pak-bugz": "^1.0.0",
     "pak-vcs": "^1.0.0",
     "yargs": "^17.7.2"
   }

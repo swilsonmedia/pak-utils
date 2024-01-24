@@ -16,5 +16,10 @@ import status from './lib/status.js';
 import switchToBranch from './lib/switchtobranch.js';
 import isRepo from './lib/isrepo.js';
 
-export { add, checkout, cherryPick, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo }
+const vcs = { add, checkout, cherryPick, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo }
+
+
+export default vcs;
+
+export { add, checkout, cherryPick, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo };
 

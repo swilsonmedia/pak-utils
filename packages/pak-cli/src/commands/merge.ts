@@ -1,15 +1,12 @@
-import { Argv, Arguments} from 'yargs';
-import * as vcs from '../../../pak-vcs/dist/index.js';
-import * as branch from '../utils/branch.js';
-import createClient from 'pak-bugz';
+import { Argv } from 'yargs';
+import { BranchUtils, Prompts, VCS, CleanUpProps, BugzClient, MiddlewareHandlerArguments } from '../types.js';
 
 interface Handler {
-    userSettings: StoreConfigProps,
-    prompts: prompts.All,
-    vcs: typeof vcs,
-    branch: typeof branch,
-    createClient: typeof createClient,
-    cleanup: (branchName: string, branches: string[], verbose: boolean) => void
+    prompts: Prompts,
+    vcs: VCS,
+    branch: BranchUtils,
+    bugzClient: BugzClient,
+    cleanup: (args: CleanUpProps) => void
 }
 
 export const cmd = 'merge';
@@ -29,21 +26,15 @@ export function builder(yargs: Argv) {
         })
 }
 
-export function makeHandler({
-        userSettings,
+export function makeHandler({        
         prompts,
         vcs,
         branch,
-        createClient,
+        bugzClient,
         cleanup
     }: Handler
 ){
-    return async ({ verbose }: Arguments) => {
-        if (!await vcs.isRepo()) {
-            console.error('Not a git repository (or any of the parent directories)');
-            process.exit(1);
-        }
-
+    return async ({ verbose, userSettings }: MiddlewareHandlerArguments) => {
         const log = logger(!!verbose);       
 
         const author = await vcs.getAuthorEmail();
@@ -53,7 +44,7 @@ export function makeHandler({
                             .filter(b => branch.isBugBranchName(b))
                             .map(b => branch.getBugIdFromBranchName(b));
 
-        const client = createClient({
+        const client = bugzClient({
             token: userSettings.token,
             origin: userSettings.origin
         });
@@ -113,7 +104,12 @@ export function makeHandler({
         console.log(`Changes from "${branchName}" were merged to "${userSettings.branch}"`);
         console.log('');
 
-        await cleanup(branchName, branches, !!verbose);
+        await cleanup({
+            branches,
+            branchName,
+            defaultBranch: userSettings.branch,
+            verbose: !!verbose
+        });
 
         const mergeAnswer = await prompts.confirm({
             message: 'Merge to release tag?',

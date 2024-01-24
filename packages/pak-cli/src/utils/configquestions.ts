@@ -1,5 +1,6 @@
+import {Prompts} from "../types.js";
 
-export default function getQuestions({input, select}: prompts.All){
+export default function getQuestions({input, select}: Prompts){
     async function username(){
         return await input({
             message: 'What username would you like to use in GIT branches?',
