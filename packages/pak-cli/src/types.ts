@@ -1,6 +1,4 @@
-// @ts-ignore
 import vcs from '@pak/vcs';
-// @ts-ignore
 import createClient from '@pak/bugz';
 import branchUtilities from './utils/branch.js';
 import {makeCleanup} from './commands/cleanup.js';

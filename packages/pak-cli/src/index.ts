@@ -11,11 +11,9 @@ import * as commit from './commands/commit.js';
 import * as cleanup from './commands/cleanup.js';
 import * as merge from './commands/merge.js';
 import * as prompts from './utils/prompts.js';
-// @ts-ignore
 import * as vcs from '@pak/vcs';
 import branchUtilities from './utils/branch.js';
 import versionControlUtilities from './utils/versioncontrol.js';
-// @ts-ignore
 import createClient from '@pak/bugz';
 import { MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
 
