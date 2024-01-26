@@ -1,13 +1,5 @@
 import { Argv } from 'yargs';
-import { BranchUtils, Prompts, VCS, CleanUpProps, BugzClient, MiddlewareHandlerArguments } from '../types.js';
-
-interface Handler {
-    prompts: Prompts,
-    vcs: VCS,
-    branch: BranchUtils,
-    bugzClient: BugzClient,
-    cleanup: (args: CleanUpProps) => void
-}
+import { MakeCleanup, MiddlewareHandlerArguments } from '../types.js';
 
 export const cmd = 'merge';
 
@@ -26,30 +18,15 @@ export function builder(yargs: Argv) {
         })
 }
 
-export function makeHandler({        
-        prompts,
-        vcs,
-        branch,
-        bugzClient,
-        cleanup
-    }: Handler
-){
-    return async ({ verbose, userSettings }: MiddlewareHandlerArguments) => {
+export function makeHandler(makeCleanup: MakeCleanup){
+    return async ({ verbose, _pak: { branch, versionControl, prompts, bugz } }: MiddlewareHandlerArguments) => {
         const log = logger(!!verbose);       
 
-        const author = await vcs.getAuthorEmail();
         
-        const branches = await branch.getBranches(userSettings.username, userSettings.branch, await vcs.listBranches(true)); 
-        const existingCaseIds = branches
-                            .filter(b => branch.isBugBranchName(b))
-                            .map(b => branch.getBugIdFromBranchName(b));
+        const branches = await branch.getLocalUserBranches(); 
+        const existingCaseIds = branch.getIdsFromBranches(branches);
 
-        const client = bugzClient({
-            token: userSettings.token,
-            origin: userSettings.origin
-        });
-
-        const casesList = await client.listCases({cols: ['sTitle']});
+        const casesList = await bugz.listCases({cols: ['sTitle']});
         const existingCasesList = casesList.filter((c: any) => existingCaseIds.includes(c.ixBug.toString()));
         
         if (!existingCasesList.length) {   
@@ -65,9 +42,15 @@ export function makeHandler({
             }))
         });
 
-        const branchName = branch.buildBranchName(userSettings.username, bugId);
+        const defaultBranch = await branch.defaultBranchName();
 
-        const logResults = await vcs.logForAuthorEmail(author);
+        if(!defaultBranch){
+            console.error('Could not discover default branch');
+            process.exit(1);
+        }
+
+        const branchName = branch.buildBranchName(+bugId);
+        const logResults = await versionControl.log();
         const topBugLogs = findBugCases(logResults, bugId);
 
         if (!topBugLogs.length) {
@@ -92,22 +75,23 @@ export function makeHandler({
             commitMessage = answer;
         }
 
-        log(await vcs.switchToBranch(userSettings.branch));
-        log(await vcs.pull())
-        log(await vcs.switchToBranch(branchName));
-        log(await vcs.merge(userSettings.branch, buildCommitMessage(bugId, 'merging master to branch'), false));
-        log(await vcs.switchToBranch(userSettings.branch));
-        log(await vcs.merge(branchName, '', true));
-        log(await vcs.commit(buildCommitMessage(bugId, commitMessage)));
-        log(await vcs.push());
+        log(await versionControl.switchToDefault());
+        log(await versionControl.pull())
+        log(await versionControl.switchTo(branchName));
+        log(await versionControl.merge(defaultBranch, buildCommitMessage(bugId, 'merging master to branch'), false));
+        log(await versionControl.switchToDefault());
+        log(await versionControl.merge(branchName, '', true));
+        log(await versionControl.commit(buildCommitMessage(bugId, commitMessage)));
+        log(await versionControl.push());
 
-        console.log(`Changes from "${branchName}" were merged to "${userSettings.branch}"`);
+        console.log(`Changes from "${branchName}" were merged to "${defaultBranch}"`);
         console.log('');
+
+        const cleanup = makeCleanup(versionControl);
 
         await cleanup({
             branches,
             branchName,
-            defaultBranch: userSettings.branch,
             verbose: !!verbose
         });
 
@@ -117,16 +101,18 @@ export function makeHandler({
         });
 
         if (mergeAnswer) {
+            const releaseBranches = await branch.getReleaseBranches();
+
             const releaseAnswer = await prompts.select({
                 message: 'Select the release branch?',
-                choices: branches.filter(b => b.includes('releasetags'))
+                choices: releaseBranches
             });
             
-            const mainCommits = await vcs.logForAuthorEmail(author);
+            const mainCommits = await versionControl.log();
             
-            log(await vcs.switchToBranch(releaseAnswer));
+            log(await versionControl.switchTo(releaseAnswer));
             
-            const releaseCommits = await vcs.logForAuthorEmail(author);           
+            const releaseCommits = await versionControl.log();           
 
             const commitAnswer = await prompts.select({
                 message: 'Select the commit you would like to release?',
@@ -135,16 +121,16 @@ export function makeHandler({
 
             const commitHash = commitAnswer.split(' ')[0];
             
-            log(await vcs.cherryPick(commitHash));  
-            log(await vcs.push());
-            log(await vcs.switchToBranch(userSettings.branch));     
+            log(await versionControl.cherryPick(commitHash));  
+            log(await versionControl.push());
+            log(await versionControl.switchTo(defaultBranch));     
             
             console.log('');
             console.log(`Merged ${commitHash} to ${releaseAnswer} for release`);
             console.log('');
         }
 
-        log(await vcs.switchToBranch(userSettings.branch));  
+        log(await versionControl.switchTo(defaultBranch));  
     }
 
     function logger(verbose: boolean){

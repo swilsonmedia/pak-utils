@@ -1,16 +1,20 @@
-import vcs from 'pak-vcs';
-import createClient from 'pak-bugz';
-import * as branch from './utils/branch.js';
+// @ts-ignore
+import vcs from '@pak/vcs';
+// @ts-ignore
+import createClient from '@pak/bugz';
+import branchUtilities from './utils/branch.js';
+import {makeCleanup} from './commands/cleanup.js';
+import versionControlUtilities from './utils/versioncontrol.js';
 
 export type VCS = typeof vcs;
-export type BugzClient = typeof createClient;
-export type BranchUtils = typeof branch;
+export type BranchUtilities = ReturnType<typeof branchUtilities>;
+export type VersionControl = ReturnType<typeof versionControlUtilities>;
 
 export interface StoreConfigProps { 
     username: string,    
-    branch: string,
     token: string,
-    origin: string 
+    origin: string,
+    filter: string
 }
 
 export type StoreReturnType<T> = {
@@ -24,7 +28,12 @@ export interface BaseHandlerArguments {
 }
 
 export interface MiddlewareHandlerArguments extends BaseHandlerArguments{
-    userSettings: StoreConfigProps
+    _pak: {
+        branch: BranchUtilities,
+        prompts: Prompts,
+        bugz: ReturnType<typeof createClient>,
+        versionControl: VersionControl
+    }
 }
 
 export type StoreConfig = StoreReturnType<StoreConfigProps>
@@ -56,5 +65,8 @@ export interface CleanUpProps {
     branchName: string, 
     branches: string[], 
     defaultBranch: string,
-    verbose: boolean
+    vcs: VCS,
+    verbose: boolean       
 }
+
+export type MakeCleanup = typeof makeCleanup;

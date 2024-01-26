@@ -1,13 +1,5 @@
 import { Argv } from 'yargs';
-import {BranchUtils, ConfirmPrompt, BugzClient, InputPrompt, VCS, MiddlewareHandlerArguments} from '../types.js';
-
-interface Handler {
-    confirm: ConfirmPrompt,
-    input: InputPrompt,
-    vcs: VCS,
-    branch: BranchUtils,
-    bugzClient: BugzClient
-}
+import { MiddlewareHandlerArguments } from '../types.js';
 
 export const cmd = 'commit';
 
@@ -26,70 +18,66 @@ export function builder(yargs: Argv) {
         })
 }
 
-export function makeHandler({
-        confirm,
-        input,
-        vcs,
-        branch
-    }: Handler
-){
-    return async ({ verbose }: MiddlewareHandlerArguments) => {
-        if (!await vcs.isRepo()) {
-            console.error('Not a git repository (or any of the parent directories)');
-            process.exit(1);
-        }
+export async function handler({ verbose, _pak }: MiddlewareHandlerArguments){
+    const { versionControl, prompts, branch } = _pak;
 
-        const log = logger(!!verbose);
+    const log = logger(!!verbose);
 
-        const currentStatus = await vcs.status();
-        const currentBranch = await vcs.getCurrentBranch();
+    const currentBranch = await versionControl.currentBranch();
+    const hasChanges = await versionControl.hasChanges();
+    const hasUntracked = await versionControl.hasUntrackedChanges();
 
-        if (/nothing\sto\scommit/gi.test(currentStatus)) {
-            console.error('No changes to commit');
-            process.exit(1);
-        }
+    if (!hasChanges) {
+        console.error('No changes to commit');
+        process.exit(1);
+    }
 
-        if (/untracked|Changes\snot\sstaged\sfor\scommit/gi.test(currentStatus)) {
-            log('You have untracked or unstaged changes')
+    if (hasUntracked) {
+        log('You have untracked or unstaged changes')
 
-            const wantToStage = await confirm({ 
-                message: 'Do you want to include unstaged changes in this commit?',
-                default: false
-            });
-
-            if (wantToStage) {
-                log(await vcs.add('.'));                
-            }            
-        }
-
-        let commitMessage = await input({
-            message: 'Please enter a commit message',
+        const wantToStage = await prompts.confirm({ 
+            message: 'Do you want to include unstaged changes in this commit?',
+            default: false
         });
 
-        if(branch.isBugBranchName(currentBranch)){
-            const caseId = branch.getBugIdFromBranchName(currentBranch);
-            commitMessage = buildCommitMessage(caseId, commitMessage);
+        if (wantToStage) {
+            log(await versionControl.add('.'));                
+        }            
+    }
+
+    let commitMessage = await prompts.input({
+        message: 'Please enter a commit message',
+    });
+
+    if(branch.isUserBranch(currentBranch)){
+        const caseId = branch.findBranchId(currentBranch);
+
+        if(!caseId){
+            console.error('An Id could not be discovered from ${currentBranch}');
+            process.exit(1);
         }
 
-        log(await vcs.commit(commitMessage));
-        log(await vcs.push());
-
-        console.log('Committed changes to local and remote branch!');
+        commitMessage = buildCommitMessage(caseId, commitMessage);
     }
 
-    function logger(verbose: boolean){
-        return (input: string): void => {
-            if(!verbose){
-                return;
-            }
+    log(await versionControl.commit(commitMessage));
+    log(await versionControl.push());
 
-            console.log(input);
+    console.log('Committed changes to local and remote branch!');
+}
+
+function logger(verbose: boolean){
+    return (input: string): void => {
+        if(!verbose){
+            return;
         }
-    }
 
-    function buildCommitMessage(caseId: string | number, commitMessage: string){
-        return `BugzId: ${caseId} - ${commitMessage}`;
+        console.log(input);
     }
+}
+
+function buildCommitMessage(caseId: string | number, commitMessage: string){
+    return `BugzId: ${caseId} - ${commitMessage}`;
 }
 
 

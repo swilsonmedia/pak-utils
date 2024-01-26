@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
+        "declaration": true,
+        "target": "ESNext",
         "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitAny": true,
@@ -8,6 +11,6 @@
         "outDir": "dist"
     },
     "include": [
-        "src/"
+        "src"
     ]
 }

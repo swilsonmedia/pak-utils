@@ -12,27 +12,22 @@ async function hasAccess(file: string){
 
 export default async function createStore<T extends Record<string, any>>(filePath: string): Promise<StoreReturnType<T>>{
 
-    let store: any = {};
+    let store = new Map();
     const canReadWrite = await hasAccess(filePath);
 
     if(canReadWrite){
-        store = {
-            ...store,
-            ...JSON.parse(await readFile(filePath, 'utf8'))
-        }
+        const data = JSON.parse(await readFile(filePath, 'utf8'));
+
+        Object.entries(data).forEach(([key, value]) => store.set(key, value));
     }
 
     return {
-        get(key){
-            return store[key];
-        },
-        has(key){
-            return !!store[key];
-        },
-        async set(key, value){
-            store[key] = value;
+        get: (key: keyof T) => store.get(key),
+        has: (key: keyof T) => store.has(key),
+        set: async(key: keyof T, value) => {
+            store.set(key, value);
 
-            await writeFile(filePath, JSON.stringify(store, null, 2), { flag: 'w', encoding: 'utf8'});
+            await writeFile(filePath, JSON.stringify(Object.fromEntries(store.entries()), null, 2), { flag: 'w', encoding: 'utf8'});
         }
     }
 }

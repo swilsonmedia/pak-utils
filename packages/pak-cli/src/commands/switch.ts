@@ -1,12 +1,5 @@
 import { Argv } from 'yargs';
-import { BranchUtils, BugzClient, MiddlewareHandlerArguments, SelectPrompt, StoreConfigProps, VCS } from '../types.js';
-
-interface Handler {
-    select: SelectPrompt,
-    vcs: VCS,
-    branch: BranchUtils,
-    bugzClient: BugzClient
-}
+import { MiddlewareHandlerArguments } from '../types.js';
 
 export const cmd = 'switch';
 
@@ -24,31 +17,16 @@ export function builder(yargs: Argv) {
             }
         });
 }
-interface US {
-    userSettings: StoreConfigProps, 
-    verbose: boolean
-}
-export function makeHandler({
-        select,
-        vcs,
-        branch,
-        bugzClient
-    }: Handler
-){
-    return async ({ verbose, userSettings }:  MiddlewareHandlerArguments) => {
-        const client = bugzClient({
-            token: userSettings.token,
-            origin: userSettings.origin
-        });
 
-        const cases = await client.listCases({cols: ['sTitle']});
-        const branches = await branch.getBranches(userSettings.username, userSettings.branch, await vcs.listBranches(true));
+    export async function handler({ verbose, _pak: { branch, prompts, bugz, versionControl } }:  MiddlewareHandlerArguments){
+        const cases = await bugz.listCases({cols: ['sTitle']});
+        const branches = await branch.getBranches();
         const casesMap = new Map(cases.map((bug: any )=> [bug.ixBug, bug.sTitle]));
         const choices = branches.map(b => {
             let key = b;
 
-            if(branch.isBugBranchName(b)){
-                const id = branch.getBugIdFromBranchName(b);
+            if(branch.isUserBranch(b)){
+                const id = branch.findBranchId(b);
 
                 if(casesMap.has(id)){
                     key = `${key} - ${casesMap.get(id)}`
@@ -61,17 +39,16 @@ export function makeHandler({
             }
         });
 
-        const chosenBranch = await select({
+        const chosenBranch = await prompts.select({
             'message': 'What branch do you want to switch to?',
             'choices': choices
         });
 
-        const response = await vcs.switchToBranch(chosenBranch);
+        const response = await versionControl.switchTo(chosenBranch);
 
         if(verbose){
             console.log(response);
         }
     }
-}
 
 

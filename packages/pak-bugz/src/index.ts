@@ -9,6 +9,6 @@ export default function createClient(params: {token: string, origin: string}){
     if(!params.origin){
         throw new Error('createClient expects a origin')
     }
-    
+   
     return makeAPI(makePost(params));
 }

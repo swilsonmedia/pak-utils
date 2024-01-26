@@ -1,5 +1,5 @@
 {
-  "name": "pak-vcs",
+  "name": "@pak/vcs",
   "version": "1.0.0",
   "description": "A small subset of GIT commands",
   "main": "./dist/index.js",

@@ -1,5 +1,5 @@
-import { ArgumentsCamelCase, Argv } from "yargs";
-import {QuestionsFunc, StoreConfig} from "../types.js";
+import { Argv } from "yargs";
+import { StoreConfig } from "../types.js";
 
 export const cmd = 'config'
 
@@ -28,53 +28,35 @@ export function builder(yargs: Argv){
                 alias: 'origin',
                 type: 'string',
                 description: 'The origin part of your FogBugz site.  Ex:  http://www.fogbugz.com'
-            }
+            },
+            'f': {
+                alias: 'filter',
+                type: 'string',
+                description: 'The FogBugz filter you want to get case results for'
+            },
         });   
 }
 
-export function makeHandler(store: StoreConfig, questions: QuestionsFunc){  
-    return async (args: ArgumentsCamelCase) => {
-        if(Object.keys(args).length > 2){
-            await setByInput(args);
-            return
+export function makeHandler(store: StoreConfig){  
+    return async (args: any) => {
+        if(Object.keys(args).length <= 2){
+            console.error('No arguments were passed. Please see "pak config --help" to see the what are available.');
         }
 
-        await askAndAnswer();
+        if(args.username){
+            await store.set('username', args.username);
+        }
+
+        if(args.token){
+            await store.set('token', args.token);
+        }
+
+        if(args.origin){
+            await store.set('origin', args.origin);
+        }
+
+        if(args.filter){
+            await store.set('filter', args.filter);
+        }
     };
-
-    async function setByInput(input: any){
-        if(input.username){
-            await store.set('username', input.username);
-        }
-
-        if(input.branch){
-            await store.set('branch', input.branch);
-        }
-
-        if(input.token){
-            await store.set('token', input.token);
-        }
-
-        if(input.origin){
-            await store.set('origin', input.origin);
-        }
-    }
-
-    async function askAndAnswer(){
-        if(!store.has('username')){
-            await store.set('username', await questions.username())
-        }
-
-        if(!store.has('branch')){
-            await store.set('branch', await questions.branch())
-        }
-
-        if(!store.has('token')){
-            await store.set('token', await questions.token())
-        }
-
-        if(!store.has('origin')){
-            await store.set('origin', await questions.origin());
-        }
-    }
 }   

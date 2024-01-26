@@ -34,6 +34,8 @@ export interface ListCasesProps extends GenericCaseProps{
 
 export default function makeAPI(post: APIPost){
 
+    let defaultFilter = 'inbox';
+
     async function listPeople(){
         const { data } = await post({cmd: 'listPeople'});
         return data.people;
@@ -45,7 +47,7 @@ export default function makeAPI(post: APIPost){
     }
 
     async function listFilters(){
-        const { data } = await post({cmd: 'listFilters'});
+        const { data } = await post({cmd: 'listFilters' });
         
         return data.filters;
     }
@@ -60,6 +62,7 @@ export default function makeAPI(post: APIPost){
         const { data } = await post({
             cmd: 'listCases',
             max: MAX_DEFAULT_RESULTS,
+            sFilter: defaultFilter,
             ...params
         });
 
@@ -97,6 +100,10 @@ export default function makeAPI(post: APIPost){
         return data.case;
     }
 
+    function setDefaultFilter(filter: string){
+        defaultFilter = filter;
+    }
+
     return {
         edit,
         listCases,
@@ -105,5 +112,6 @@ export default function makeAPI(post: APIPost){
         viewCase,
         viewPerson,
         listFilters,
+        setDefaultFilter
     }
 }

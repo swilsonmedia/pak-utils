@@ -12,7 +12,7 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "build": "tsc && npm link .",
+    "build": "tsc",
     "watch": "tsc -w"
   },
   "author": "",
@@ -21,8 +21,8 @@
   "dependencies": {
     "app-root-path": "^3.1.0",
     "inquirer": "^9.2.12",
-    "pak-bugz": "^1.0.0",
-    "pak-vcs": "^1.0.0",
+    "pak-bugz": "file:../pak-bugz",
+    "pak-vcs": "file:../pak-vcs",
     "yargs": "^17.7.2"
   }
 }

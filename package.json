@@ -1,15 +1,17 @@
 {
-  "name": "pak-utils",
+  "name": "@pak/utils",
   "version": "1.0.0",
   "description": "A collection of workplace utilities",
   "author": "Stephen Wilson",
   "license": "ISC",
   "scripts": {
-    "build": "npm run build -ws"
+    "prebuild": "npm unlink ./packages/pak-cli",
+    "build": "npm run build -ws",
+    "postbuild": "npm link ./packages/pak-cli"
   },
   "workspaces": [
-    "packages/pak-bugz",
     "packages/pak-cli",
-    "packages/pak-vcs"
+    "packages/pak-vcs",
+    "packages/pak-bugz"
   ]
 }
