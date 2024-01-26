@@ -23,7 +23,7 @@ export async function handler({ verbose, _pak: { branch, prompts, bugz, versionC
     const branches = await branch.getBranches();
     const casesList = await bugz.listCases({cols: ['sTitle']});
     const existingCaseIds = branch.getIdsFromBranches(branches);
-    const choices = casesList.filter((c: any) => existingCaseIds.includes(Number(c.ixBug)));
+    const choices = casesList.filter((c: any) => existingCaseIds.includes(c.ixBug));
 
     if (!casesList.length) {
         console.error('No cases were found');

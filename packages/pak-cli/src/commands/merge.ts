@@ -27,7 +27,7 @@ export function makeHandler(makeCleanup: MakeCleanup){
         const existingCaseIds = branch.getIdsFromBranches(branches);
 
         const casesList = await bugz.listCases({cols: ['sTitle']});
-        const existingCasesList = casesList.filter((c: any) => existingCaseIds.includes(c.ixBug.toString()));
+        const existingCasesList = casesList.filter((c: any) => existingCaseIds.includes(c.ixBug));
         
         if (!existingCasesList.length) {   
             console.error('No cases were found');

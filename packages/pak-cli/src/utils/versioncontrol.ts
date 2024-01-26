@@ -19,7 +19,7 @@ export default function versionControlUtilities(vcs: VCS, defaultBranch: string)
     }
 
     const hasChanges = async () => {
-        return /nothing\sto\scommit/gi.test(await vcs.status());
+        return !/nothing\sto\scommit/gi.test(await vcs.status());
     }
 
     return {

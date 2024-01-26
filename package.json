@@ -13,5 +13,8 @@
     "packages/pak-cli",
     "packages/pak-vcs",
     "packages/pak-bugz"
-  ]
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
