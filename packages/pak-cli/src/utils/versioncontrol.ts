@@ -22,13 +22,20 @@ export default function versionControlUtilities(vcs: VCS, defaultBranch: string)
         return !/nothing\sto\scommit/gi.test(await vcs.status());
     }
 
+    const deleteBranch = async (branchName: string) => {
+        return [
+            await vcs.deleteLocalBranch(branchName),
+            await vcs.deleteRemoteBranch(branchName)
+        ].join('\n\n');
+    }
+
     return {
         add: vcs.add,
         checkout,
         cherryPick: vcs.cherryPick,
         commit: vcs.commit,
         currentBranch: vcs.getCurrentBranch,
-        deleteBranch: vcs.deleteBranch,
+        deleteBranch,
         hasChanges,
         hasUntrackedChanges,
         branches: vcs.listBranches,

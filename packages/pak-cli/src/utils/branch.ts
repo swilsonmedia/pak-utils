@@ -100,12 +100,10 @@ export default function branchUtilities(listBranches: () => Promise<string[]>, u
     const isUserBranch = makeIsUserBranch(userExpression);
     const userBranches = (branches: string[]) => branches.filter(isUserBranch);
     const findBranchId = makeFindBranchId(userExpression);
-
     const local = compose(unique, localBranches, removeDefaultBranch, removeHead, userBranches);
     const remote = compose(unique, removeRemoteStrings, remoteBranches, removeDefaultBranch, removeHead, userBranches);
     const release = compose(unique, removeRemoteStrings, removeHead, releaseBranches);
     const branches = compose(unique, removeRemoteStrings, removeHead)
-
     const getBranches = async () => branches(await listBranches());
     const getLocalUserBranches = async () => local(await listBranches());
     const getRemoteUserBranches = async () => remote(await listBranches());

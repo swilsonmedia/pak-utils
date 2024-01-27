@@ -71,6 +71,7 @@ export function makeCleanup(versionControl: VersionControl){
 
         verboseLogger(await versionControl.deleteBranch(branchName));
 
+
         console.log(`${branchName} was deleted`);
     }
 }

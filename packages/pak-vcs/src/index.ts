@@ -2,7 +2,8 @@ import add from './lib/add.js';
 import checkout from './lib/checkout.js';
 import cherryPick from './lib/cherrypick.js';
 import commit from './lib/commit.js';
-import deleteBranch from './lib/deletebranch.js';
+import deleteLocalBranch from './lib/deletelocalbranch.js'; './lib/deletelocalbranch.js';
+import deleteRemoteBranch from './lib/deleteremotebranch.js';
 import getAuthorEmail from './lib/getauthoremail.js';
 import getCurrentBranch from './lib/getcurrentbranch.js';
 import logForAuthorEmail from './lib/logforauthoremail.js';
@@ -15,9 +16,9 @@ import status from './lib/status.js';
 import switchToBranch from './lib/switchtobranch.js';
 import isRepo from './lib/isrepo.js';
 
-const vcs = { add, checkout, cherryPick, commit, deleteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo }
+const vcs = { add, checkout, cherryPick, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo }
 
 export default vcs;
 
-export { add, checkout, cherryPick, commit, deleteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo };
+export { add, checkout, cherryPick, commit, deleteLocalBranch, deleteRemoteBranch, getAuthorEmail, getCurrentBranch, logForAuthorEmail, merge, listBranches, pull, push, setUpstream, status, switchToBranch, isRepo };
 
