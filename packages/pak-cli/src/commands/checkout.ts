@@ -1,6 +1,5 @@
 import { Argv } from 'yargs';
 import { MiddlewareHandlerArguments } from '../types.js';
-import applicationError from '../utils/applicationerror.js';
 
 export const cmd = 'checkout';
 
@@ -11,7 +10,7 @@ export function builder(yargs: Argv) {
         .usage(`pak ${cmd}`);
 }
 
-export async function handler({ _pak: { branch, prompts, bugz, logger }  }: MiddlewareHandlerArguments){
+export async function handler({ _pak: { branch, prompts, bugz, logger, applicationError }  }: MiddlewareHandlerArguments){
     try {
         const existingCaseIds = await branch.getExistingBugIds();
         const casesList = await bugz.listCases({cols: ['sTitle']});
@@ -33,9 +32,11 @@ export async function handler({ _pak: { branch, prompts, bugz, logger }  }: Midd
                 value: c.ixBug
             }))
         });
-
+        
         logger.log(await branch.checkout(+id));
-        logger.success(`Branch checkout complete!`)
+
+        await bugz.edit(id, {'plugin_customfields_at_fogcreek_com_casexmilestoneh849': '3.Coding in Progress'});
+        logger.success(`Branch checkout complete!`, `Set Case Milestone to 3. Coding in Progress`);
     } catch (error) {
         applicationError(error);
     }

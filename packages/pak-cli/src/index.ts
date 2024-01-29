@@ -17,6 +17,7 @@ import branchUtilities from './utils/branch.js';
 import makeLogger from './utils/logger.js';
 import applicationError from './utils/applicationerror.js';
 import createStore from './utils/configurationstore.js';
+import openInBrowser from './utils/openinbrowser.js';
 
 (async () => {
     const pkgJSON = pkg();
@@ -74,7 +75,9 @@ import createStore from './utils/configurationstore.js';
                 prompts,
                 branch,
                 bugz,
-                logger
+                logger,
+                openInBrowser,
+                applicationError
             };
         } catch (error) {
             applicationError(error);

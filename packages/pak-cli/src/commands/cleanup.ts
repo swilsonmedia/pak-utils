@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { MiddlewareHandlerArguments } from '../types.js';
-import applicationError from '../utils/applicationerror.js';
+
 
 export const cmd = 'cleanup';
 
@@ -11,7 +11,7 @@ export function builder(yargs: Argv) {
         .usage(`pak ${cmd}`);
 }
 
-export async function handler({ _pak: { branch, prompts, bugz, logger }  }: MiddlewareHandlerArguments){
+export async function handler({ _pak: { branch, prompts, bugz, logger, applicationError }  }: MiddlewareHandlerArguments){
     try {
         const existingCaseIds = await branch.getExistingBugIds();
         const casesList = await bugz.listCases({cols: ['sTitle']});

@@ -6,12 +6,14 @@ export default function makeLogger(quiet=false, verbose=false){
         error: (error: unknown) => {
             logError(error);
         },
-        success: (message: string) => {
+        success: (...messages: string[]) => {
             if(quiet || verbose){
                 return;
             }
 
-            log(`${chalk.green(emojiGet('heavy_check_mark'))} ${message}`);
+            const message = messages.map(message => `${chalk.green(emojiGet('heavy_check_mark'))} ${message}`).join('\n');
+
+            log(message);
         },
         log: (message: string) => {
             if(quiet || !verbose){

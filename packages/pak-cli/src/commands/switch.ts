@@ -2,6 +2,7 @@ import { Argv } from 'yargs';
 import { MiddlewareHandlerArguments } from '../types.js';
 import chalk from 'chalk';
 
+
 export const cmd = 'switch';
 
 export const description = 'Switch between branches';
@@ -11,8 +12,7 @@ export function builder(yargs: Argv) {
         .usage(`pak ${cmd}`);;
 }
 
-export async function handler({ verbose, _pak: { branch, prompts, bugz, logger } }:  MiddlewareHandlerArguments){
-    
+export async function handler({  _pak: { branch, prompts, bugz, logger, applicationError } }:  MiddlewareHandlerArguments){    
     try {
         const cases = await bugz.listCases({cols: ['sTitle']});
         const branches = await branch.listBranches();
@@ -48,8 +48,7 @@ export async function handler({ verbose, _pak: { branch, prompts, bugz, logger }
 
         logger.success(`Switch to ${chalk.bold(chosenBranch)}`)
     } catch (error) {
-        logger.error(error);
-        process.exit(1);
+        applicationError(error);
     }
 }
 

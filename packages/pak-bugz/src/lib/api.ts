@@ -37,7 +37,7 @@ export default function makeAPI(post: APIPost){
     let defaultFilter = 'inbox';
 
     async function listPeople(){
-        const { data } = await post({cmd: 'listPeople'});
+        const { data } = await post({cmd: 'listPeople', fIncludeVirtual: 1, fIncludeCommunity: 1 });
         return data.people;
     }
 

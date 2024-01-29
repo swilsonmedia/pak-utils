@@ -2,6 +2,8 @@ import vcs from '@pak/vcs';
 import createClient from '@pak/bugz';
 import branchUtilities from './utils/branch.js';
 import makeLogger from './utils/logger.js';
+import openInBrowser from './utils/openinbrowser.js';
+import applicationError from './utils/applicationerror.js';
 
 export type VCS = typeof vcs;
 export type BranchUtilities = Awaited<ReturnType<typeof branchUtilities>>;
@@ -28,7 +30,9 @@ export interface MiddlewareHandlerArguments extends BaseHandlerArguments{
         branch: BranchUtilities,
         prompts: Prompts,
         bugz: ReturnType<typeof createClient>,
-        logger: ReturnType<typeof makeLogger>
+        logger: ReturnType<typeof makeLogger>,
+        openInBrowser: typeof openInBrowser,
+        applicationError: typeof applicationError
     }
 }
 

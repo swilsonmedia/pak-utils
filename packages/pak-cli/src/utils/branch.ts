@@ -127,6 +127,8 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
             throw new Error(`Could not find a branch with the id of ${id} to delete.`);
         }
 
+        logs.push(await switchTo(defaultBranch));
+
         if(branch.isLocal){
             logs.push(await vcs.deleteLocalBranch(branch.name));
         }
