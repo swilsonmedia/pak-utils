@@ -18,20 +18,26 @@ export function builder(yargs: Argv) {
         });
 }
 
-export async function handler({ verbose, _pak: { branch, versionControl, prompts, bugz }  }: MiddlewareHandlerArguments){
+export async function handler({ verbose, _pak: { branch, prompts, bugz }  }: MiddlewareHandlerArguments){
 
-    const log = logger(!!verbose);        
-    const branches = await branch.getBranches(); 
-    const existingCaseIds = branch.getIdsFromBranches(branches);
+    const log = logger(!!verbose);   
+
+    const existingCaseIds = await branch.getExistingBugIds();
     const casesList = await bugz.listCases({cols: ['sTitle']});
-    const casesListExcludingExisting = casesList.filter((c: any) => !existingCaseIds.includes(c.ixBug))
+
+    if (!casesList.length) {
+        console.error('No cases were found');
+        process.exit(1);
+    }
+
+    const casesListExcludingExisting = casesList.filter((c: any) => !existingCaseIds.includes(+c.ixBug))
 
     if (!casesListExcludingExisting.length) {
         console.error('No cases were found');
         process.exit(1);
     }
 
-    const chosenCaseId = await prompts.select({
+    const id = await prompts.select({
         message: 'Select a case that would you like to create a branch for?',
         choices: casesListExcludingExisting.map((c: any) => ({
             name: `${c.ixBug}: ${c.sTitle}`,
@@ -39,11 +45,7 @@ export async function handler({ verbose, _pak: { branch, versionControl, prompts
         }))
     });
 
-    const branchName = branch.buildBranchName(+chosenCaseId);
-    
-    log(await versionControl.switchToDefault());        
-    log(await versionControl.pull());
-    log(await versionControl.checkout(branchName));
+    log(await branch.checkout(+id));
 }
 
 function logger(verbose: boolean){

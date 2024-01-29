@@ -19,51 +19,44 @@ export function builder(yargs: Argv) {
 }
 
 export async function handler({ verbose, _pak }: MiddlewareHandlerArguments){
-    const { versionControl, prompts, branch } = _pak;
+    const { prompts, branch } = _pak;
 
     const log = logger(!!verbose);
-
-    const currentBranch = await versionControl.currentBranch();
-    const hasChanges = await versionControl.hasChanges();
-    const hasUntracked = await versionControl.hasUntrackedChanges();
-
-    if (!hasChanges) {
-        console.error('No changes to commit');
-        process.exit(1);
-    }
-
-    if (hasUntracked) {
-        log('You have untracked or unstaged changes')
-
-        const wantToStage = await prompts.confirm({ 
-            message: 'Do you want to include unstaged changes in this commit?',
-            default: false
-        });
-
-        if (wantToStage) {
-            log(await versionControl.add('.'));                
-        }            
-    }
-
-    let commitMessage = await prompts.input({
-        message: 'Please enter a commit message',
-    });
-
-    if(branch.isUserBranch(currentBranch)){
-        const caseId = branch.findBranchId(currentBranch);
-
-        if(!caseId){
-            console.error('An Id could not be discovered from ${currentBranch}');
+    
+    try {        
+        const hasChanges = await branch.hasChanges();
+        const hasUntracked = await branch.hasUntracked();
+    
+        if (!hasChanges) {
+            console.error('No changes to commit');
             process.exit(1);
         }
+    
+        if (hasUntracked) {
+            log('You have untracked or unstaged changes')
+    
+            const wantToStage = await prompts.confirm({ 
+                message: 'Do you want to include unstaged changes in this commit?',
+                default: false
+            });
+    
+            if (wantToStage) {
+                log(await branch.addAndStageAllChanges());                
+            }            
+        }
+    
+        let commitMessage = await prompts.input({
+            message: 'Please enter a commit message',
+        });
 
-        commitMessage = buildCommitMessage(caseId, commitMessage);
+        const id = await branch.parseIdFromCurrent();
+        log(await branch.commit(id, commitMessage));
+
+        console.log('Committed changes to local and remote branch!');
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
     }
-
-    log(await versionControl.commit(commitMessage));
-    log(await versionControl.push());
-
-    console.log('Committed changes to local and remote branch!');
 }
 
 function logger(verbose: boolean){
@@ -75,9 +68,3 @@ function logger(verbose: boolean){
         console.log(input);
     }
 }
-
-function buildCommitMessage(caseId: string | number, commitMessage: string){
-    return `BugzId: ${caseId} - ${commitMessage}`;
-}
-
-

@@ -18,37 +18,41 @@ export function builder(yargs: Argv) {
         });
 }
 
-    export async function handler({ verbose, _pak: { branch, prompts, bugz, versionControl } }:  MiddlewareHandlerArguments){
-        const cases = await bugz.listCases({cols: ['sTitle']});
-        const branches = await branch.getBranches();
-        const casesMap = new Map(cases.map((bug: any )=> [bug.ixBug, bug.sTitle]));
-        const choices = branches.map(b => {
-            let key = b;
+export async function handler({ verbose, _pak: { branch, prompts, bugz } }:  MiddlewareHandlerArguments){
+    const cases = await bugz.listCases({cols: ['sTitle']});
+    const branches = await branch.listBranches();
+    const casesMap = new Map(cases.map((bug: any )=> [bug.ixBug.toString(), bug.sTitle]));
+    const choices = branches
+        .filter(b => {
+            return b.type !== 'case' || casesMap.has(b.id.toString())
+        })
+        .map(b => {
+            let key = b.name;
 
-            if(branch.isUserBranch(b)){
-                const id = branch.findBranchId(b);
-
+            if(b.type === 'case'){
+                const id = b.id.toString();
+                
                 if(casesMap.has(id)){
-                    key = `${key} - ${casesMap.get(id)}`
+                    key = `${b.id} - ${casesMap.get(id)}`
                 }
             }
 
             return {
                 name: key,
-                value: b
+                value: b.name
             }
         });
 
-        const chosenBranch = await prompts.select({
-            'message': 'What branch do you want to switch to?',
-            'choices': choices
-        });
+    const chosenBranch = await prompts.select({
+        'message': 'What branch do you want to switch to?',
+        'choices': choices
+    });
 
-        const response = await versionControl.switchTo(chosenBranch);
+    const response = await branch.switchTo(chosenBranch);
 
-        if(verbose){
-            console.log(response);
-        }
+    if(verbose){
+        console.log(response);
     }
+}
 
 

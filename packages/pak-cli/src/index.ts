@@ -13,7 +13,6 @@ import * as merge from './commands/merge.js';
 import * as prompts from './utils/prompts.js';
 import * as vcs from '@pak/vcs';
 import branchUtilities from './utils/branch.js';
-import versionControlUtilities from './utils/versioncontrol.js';
 import createClient from '@pak/bugz';
 import { MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
 
@@ -21,9 +20,7 @@ import { MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
     const pkgJSON = pkg();
     const store = await createStore<StoreConfigProps>(path.join(import.meta.dirname, '../.pak'));
 
-    const getPakParameters = async () => {
-        const listBranches = async () => await vcs.listBranches(true);
-        
+    const getPakParameters = async () => {       
         if(!store.has('username')){
             await store.set('username', await prompts.input({
                 message: 'What username do you use for GIT branching?'
@@ -42,7 +39,7 @@ import { MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
             }));
         }
 
-        const branch = branchUtilities(listBranches, `users/${store.get('username')}/fb-`);
+        const branch = await branchUtilities(vcs, store.get('username'));
         
         const bugz = createClient({
             token: store.get('token'),
@@ -67,20 +64,10 @@ import { MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
         
         bugz.setDefaultFilter(store.get('filter'));
 
-        const defaultBranch = await branch.defaultBranchName();
-
-        if(!defaultBranch){
-            console.error('Could not find default branch name');
-            process.exit(1);
-        }
-
-        const versionControl = versionControlUtilities(vcs, defaultBranch);
-
         return {
             prompts,
             branch,
-            bugz,
-            versionControl
+            bugz
         };
     }
           
@@ -104,10 +91,10 @@ import { MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
         .scriptName(Object.keys(pkgJSON.bin)[0])
         .showHelpOnFail(true)
         .command<MiddlewareHandlerArguments>(switchCommand.cmd, switchCommand.description, switchCommand.builder, switchCommand.handler)
+        .command<MiddlewareHandlerArguments>(merge.cmd, merge.description, merge.builder, merge.handler)
         .command<MiddlewareHandlerArguments>(cleanup.cmd, cleanup.description, cleanup.builder, cleanup.handler)
         .command<MiddlewareHandlerArguments>(checkout.cmd, checkout.description, checkout.builder, checkout.handler)
         .command<MiddlewareHandlerArguments>(commit.cmd, commit.description, commit.builder, commit.handler)
-        .command<MiddlewareHandlerArguments>(merge.cmd, merge.description, merge.builder, merge.makeHandler(cleanup.makeCleanup))
         .command(config.cmd, config.description, config.builder, config.makeHandler(store))   
         .middleware(middleware)     
         .showHelpOnFail(true)

@@ -1,12 +1,9 @@
 import vcs from '@pak/vcs';
 import createClient from '@pak/bugz';
 import branchUtilities from './utils/branch.js';
-import {makeCleanup} from './commands/cleanup.js';
-import versionControlUtilities from './utils/versioncontrol.js';
 
 export type VCS = typeof vcs;
-export type BranchUtilities = ReturnType<typeof branchUtilities>;
-export type VersionControl = ReturnType<typeof versionControlUtilities>;
+export type BranchUtilities = Awaited<ReturnType<typeof branchUtilities>>;
 
 export interface StoreConfigProps { 
     username: string,    
@@ -29,8 +26,7 @@ export interface MiddlewareHandlerArguments extends BaseHandlerArguments{
     _pak: {
         branch: BranchUtilities,
         prompts: Prompts,
-        bugz: ReturnType<typeof createClient>,
-        versionControl: VersionControl
+        bugz: ReturnType<typeof createClient>
     }
 }
 
@@ -67,4 +63,3 @@ export interface CleanUpProps {
     verbose: boolean       
 }
 
-export type MakeCleanup = typeof makeCleanup;
