@@ -1,4 +1,3 @@
-import {getAuthorEmail} from "pak-vcs";
 import {VCS} from "../types.js";
 
 const compose = <T extends any[]>(...functions: T) => {
@@ -203,7 +202,7 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
     }
 
     const log = async () => {
-        return await vcs.logForAuthorEmail(await getAuthorEmail());
+        return await vcs.logForAuthorEmail(await vcs.getAuthorEmail());
     }
 
     const logCaseCheckins = async (id: number) => {
