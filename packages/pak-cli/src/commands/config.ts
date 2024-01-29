@@ -1,5 +1,6 @@
 import { Argv } from "yargs";
 import { StoreConfig } from "../types.js";
+import applicationError from "../utils/applicationerror.js";
 
 export const cmd = 'config'
 
@@ -40,7 +41,7 @@ export function builder(yargs: Argv){
 export function makeHandler(store: StoreConfig){  
     return async (args: any) => {
         if(Object.keys(args).length <= 2){
-            console.error('No arguments were passed. Please see "pak config --help" to see the what are available.');
+            applicationError('No arguments were passed. Please see "pak config --help" to see the what are available.');
         }
 
         if(args.username){

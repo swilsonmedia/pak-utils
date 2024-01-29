@@ -1,45 +1,5 @@
+import chalk from "chalk";
 import {VCS} from "../types.js";
-
-const compose = <T extends any[]>(...functions: T) => {
-  return <U>(input: U): U => {
-    return functions.reduceRight((acc, fn) => {
-      return fn(acc);
-    }, input);
-  };
-};
-
-const REMOTE_STRING = 'remotes/origin/';
-const RELEASE_STRING = 'releasetags/';
-const MESSAGE_PREFIX = 'BugzId: ';
-const MESSAGE_SEPARATOR = ' - ';
-
-function unique(arr: any[]){
-    return [...new Set(arr)];
-}
-
-function isReleaseTag(branch: string){
-    return branch.includes(RELEASE_STRING)
-}
-
-function isRecentReleaseTag(branchName: string) {
-    return isReleaseTag(branchName) && isWithinTimeFrame(diffInDaysFromToday(findDateFromString(branchName)))
-}
-
-function isWithinTimeFrame(days: number) {
-    return days < 45;
-}
-
-function diffInDaysFromToday(date = Intl.DateTimeFormat('en-US').format(new Date())) {
-    const compare = new Date(date);
-    const today = new Date();
-
-    return (today.getTime() - compare.getTime()) / (1000 * 3600 * 24);
-}
-
-function findDateFromString(str: string) {
-    const results = /\d\/\d\/\d/.exec(str);
-    return Array.isArray(results) ? results[0] : undefined; 
-}
 
 interface BaseBranchItem {
     name: string,
@@ -63,13 +23,10 @@ interface CaseBranchItem extends BaseBranchItem {
 
 type BranchItem =  DefaultBranchItem | ReleaseBranchItem | CaseBranchItem | never;
 
-function findDefaultBranch(branches: string[]){
-    return branches.find(branchName => /^(main|master)$/.test(branchName));
-}
-
-function joinLogs(...msgs: string[]){
-    return msgs.join('\n\n');
-}
+const REMOTE_STRING = 'remotes/origin/';
+const RELEASE_STRING = 'releasetags/';
+const MESSAGE_PREFIX = 'BugzId: ';
+const MESSAGE_SEPARATOR = ' - ';
 
 export default async function branchUtilities(vcs: VCS, userName: string, ){
     const BRANCH_NAME_PREFIX = `users/${userName}/fb-`;
@@ -78,10 +35,6 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
         return `${BRANCH_NAME_PREFIX}${id}`;
     }
 
-    function buildMessage(id: number, message: string){
-        return `${MESSAGE_PREFIX}${id}${MESSAGE_SEPARATOR}${message}`;
-    }
-    
     const defaultBranch = findDefaultBranch(await vcs.listBranches(true));
  
     if(!defaultBranch){
@@ -95,18 +48,13 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
                                 return !isReleaseTag(branch) || isRecentReleaseTag(branch)
                             });
 
-        const isRemote = (branch: string) => branch.includes(REMOTE_STRING);
-        const removeRemotePrefix = (branch: string) => branch.replace(REMOTE_STRING, '');
-
         const remotes = branches
-            .filter(isRemote)
-            .map(removeRemotePrefix);
+                            .filter(isRemote)
+                            .map(removeRemotePrefix);
 
         const locals = branches.filter(branch => !isRemote(branch));
 
-        const uniqueBranchNames = unique(branches.map(removeRemotePrefix));
-
-        return uniqueBranchNames.map(branch => {
+        return unique(branches.map(removeRemotePrefix)).map(branch => {
             const data = {
                 name: branch,
                 isLocal: locals.includes(branch),
@@ -170,8 +118,6 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
     };
 
     const deleteBranch = async (id: number) => {
-        const branchName = buildBranchName(id);
-
         const branch = (await listBranches())
                         .find(branch => branch.type === 'case' && branch.name.replace(BRANCH_NAME_PREFIX, '') === id.toString());
 
@@ -201,18 +147,12 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
                 });
     }
 
-    const log = async () => {
-        return await vcs.logForAuthorEmail(await vcs.getAuthorEmail());
-    }
-
     const logCaseCheckins = async (id: number) => {
-        const checkins = await log();       
+        const checkins = await vcs.logForAuthorEmail(await vcs.getAuthorEmail());       
         const bugReg = new RegExp(`${MESSAGE_PREFIX.replace(':', '\\:')}${id}\\s\\-\\s`, 'gi');
 
         return checkins.split('\n')
-            .filter(log => {
-                return bugReg.test(log);
-            })
+            .filter(log => bugReg.test(log))
             .map(log => {
                 const parts = log.split(bugReg);
 
@@ -227,7 +167,6 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
     const findUnmergedReleaseCommits = async (id: number, release: string) => {
         const targetRelease = release.replace(/(\d+)\/(\d+)\/(\d+)/, "$3/$1/$2");
 
-        console.log(targetRelease);
         const releaseBranch = (await listBranches())
                                     .find(branch => branch.type === 'release' && branch.name.includes(targetRelease));
         if(!releaseBranch){
@@ -273,13 +212,13 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
         const branch = await vcs.getCurrentBranch();
         
         if(!branch.includes(BRANCH_NAME_PREFIX)){
-            throw new Error(`Branch ${branch.trim()} is not a user case branch`);
+            throw new Error(`Branch "${chalk.bold(branch.trim())}" is not a case branch`);
         }
 
         const match = branch.match(/\d+/g);
 
         if(!match){
-            throw new Error(`An id could not be parsed from ${branch}`);
+            throw new Error(`An case id could not be parsed from "${chalk.bold(branch.trim())}"`);
         }
 
         return +match[0];       
@@ -314,4 +253,52 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
         merge,
         switchTo
     }
- }
+}
+
+function buildMessage(id: number, message: string){
+    return `${MESSAGE_PREFIX}${id}${MESSAGE_SEPARATOR}${message}`;
+}
+
+function isRemote(branch: string){
+    return branch.includes(REMOTE_STRING);
+}
+
+function removeRemotePrefix(branch: string){
+    return branch.replace(REMOTE_STRING, '');
+}
+
+function unique(arr: any[]){
+    return [...new Set(arr)];
+}
+
+function isReleaseTag(branch: string){
+    return branch.includes(RELEASE_STRING)
+}
+
+function isRecentReleaseTag(branchName: string) {
+    return isReleaseTag(branchName) && isWithinTimeFrame(diffInDaysFromToday(findDateFromString(branchName)))
+}
+
+function isWithinTimeFrame(days: number) {
+    return days < 45;
+}
+
+function diffInDaysFromToday(date = Intl.DateTimeFormat('en-US').format(new Date())) {
+    const compare = new Date(date);
+    const today = new Date();
+
+    return (today.getTime() - compare.getTime()) / (1000 * 3600 * 24);
+}
+
+function findDateFromString(str: string) {
+    const results = /\d\/\d\/\d/.exec(str);
+    return Array.isArray(results) ? results[0] : undefined; 
+}
+
+function findDefaultBranch(branches: string[]){
+    return branches.find(branchName => /^(main|master)$/.test(branchName));
+}
+
+function joinLogs(...msgs: string[]){
+    return msgs.join('\n\n');
+}
