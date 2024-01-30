@@ -206,9 +206,13 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
             )
     };
 
-    const getExistingBugIds = async () => {
+    const getCaseBranches = async () => {
         return (await listBranches())
-            .filter(branch => branch.isLocal && branch.type === "case")
+            .filter((branch): branch is CaseBranchItem => branch.type === "case")
+    }
+
+    const getExistingBugIds = async () => {
+        return (await getCaseBranches())
             .map((branch: any) => +branch.id); 
     };
 
@@ -246,6 +250,7 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
         commit,
         delete: deleteBranch,
         findUnmergedReleaseCommits,
+        getCaseBranches,
         getExistingBugIds,
         hasUntracked,
         hasChanges,

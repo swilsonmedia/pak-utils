@@ -16,13 +16,13 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
         const casesList = await bugz.listCases({cols: ['sTitle']});
 
         if (!casesList.length) {
-            applicationError('No cases were found');        
+            applicationError('No cases were found in your queue to work on.');        
         }
 
         const casesListExcludingExisting = casesList.filter((c: any) => !existingCaseIds.includes(+c.ixBug))
 
         if (!casesListExcludingExisting.length) {
-            applicationError('No cases were found');        
+            applicationError('There are no new cases to checkout that you have not already.  Try using the "switch" command.');        
         }
 
         const id = await prompts.select({

@@ -13,20 +13,17 @@ export function builder(yargs: Argv) {
 
 export async function handler({ _pak: { branch, prompts, bugz, logger, applicationError }  }: MiddlewareHandlerArguments){
     try {
-        const existingCaseIds = await branch.getExistingBugIds();
+        const caseBranches = await branch.getCaseBranches();
         const casesList = await bugz.listCases({cols: ['sTitle']});
-        
-        if (!casesList.length) {
-            applicationError('No cases were found');
-        }
-
-        const existingCasesList = casesList.filter((c: any) => existingCaseIds.includes(c.ixBug));
-        
-        if (!existingCasesList.length) {   
-            applicationError('No cases were found');
-        }
-        
-        const choices = casesList.filter((c: any) => existingCaseIds.includes(c.ixBug));
+        const caseListMap = new Map(casesList.map((item: any) => ([item.ixBug, item.sTitle])));
+       
+        const choices = caseBranches
+            .map(({id, name}) => {                
+                return {
+                    name: `${name}${caseListMap.has(id) ? ` - ${caseListMap.get(id)}` : ''}`,
+                    value: id.toString()
+                }
+            });
         
         if(!choices.length){
             applicationError('No cases branches were found to remove');
@@ -34,10 +31,7 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
         
         const id = await prompts.select({
             message: 'Select a case that would you like to create a branch for?',
-            choices: choices.map((c: {ixBug: string, sTitle: string}) => ({
-                name: `${c.ixBug}: ${c.sTitle}`,
-                value: c.ixBug
-            }))
+            choices
         });
     
         logger.log(await branch.delete(+id));
@@ -45,4 +39,16 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
     } catch (error) {
         applicationError(error);
     }
+}
+
+function group(arr: any[], prop: string){
+    return arr.reduce((obj, item) => {
+        if(!obj[item[prop]]){
+            obj[item[prop]] = [];
+        }
+
+        obj[item[prop]].push(item);
+
+        return obj;
+    }, {});
 }
