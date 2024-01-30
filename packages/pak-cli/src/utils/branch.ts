@@ -45,12 +45,14 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
         const branches = (await vcs.listBranches(true))
                             .filter(branch => !branch.includes('HEAD'))
                             .filter(branch => {
-                                return !isReleaseTag(branch) || isRecentReleaseTag(branch)
+                                return isRecentReleaseTag(branch)
+                                    || branch.includes(BRANCH_NAME_PREFIX) 
+                                    || /main|master/gi.test(branch)
                             });
 
         const remotes = branches
                             .filter(isRemote)
-                            .map(removeRemotePrefix);
+                            .map(removeRemotePrefix);                           
 
         const locals = branches.filter(branch => !isRemote(branch));
 
@@ -293,7 +295,7 @@ function diffInDaysFromToday(date = Intl.DateTimeFormat('en-US').format(new Date
 }
 
 function findDateFromString(str: string) {
-    const results = /\d\/\d\/\d/.exec(str);
+    const results = /\d+\/\d+\/\d+/.exec(str);
     return Array.isArray(results) ? results[0] : undefined; 
 }
 
