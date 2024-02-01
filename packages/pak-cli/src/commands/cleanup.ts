@@ -1,7 +1,6 @@
 import { Argv } from 'yargs';
 import { MiddlewareHandlerArguments } from '../types.js';
 
-
 export const cmd = 'cleanup';
 
 export const description = 'Delete old branches from local and remote';
@@ -11,7 +10,7 @@ export function builder(yargs: Argv) {
         .usage(`pak ${cmd}`);
 }
 
-export async function handler({ _pak: { branch, prompts, bugz, logger, applicationError }  }: MiddlewareHandlerArguments){
+export async function handler({ _pak: { runTasks, branch, prompts, bugz, applicationError }  }: MiddlewareHandlerArguments){
     try {
         const caseBranches = await branch.getCaseBranches();
         const casesList = await bugz.listCases({cols: ['sTitle']});
@@ -34,21 +33,13 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
             choices
         });
     
-        logger.log(await branch.delete(+id));
-        logger.success(`Branch deleted`);
+       await runTasks([
+            {
+                title: `Delete branch for case #${id}`,
+                task: async () => await branch.delete(+id)
+            }
+        ]);           
     } catch (error) {
         applicationError(error);
     }
-}
-
-function group(arr: any[], prop: string){
-    return arr.reduce((obj, item) => {
-        if(!obj[item[prop]]){
-            obj[item[prop]] = [];
-        }
-
-        obj[item[prop]].push(item);
-
-        return obj;
-    }, {});
 }

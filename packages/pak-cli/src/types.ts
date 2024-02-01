@@ -1,9 +1,9 @@
 import vcs from '@pak/vcs';
 import createClient from '@pak/bugz';
 import branchUtilities from './utils/branch.js';
-import makeLogger from './utils/logger.js';
 import openInBrowser from './utils/openinbrowser.js';
 import applicationError from './utils/applicationerror.js';
+import runTasks from './utils/tasks.js';
 
 export type VCS = typeof vcs;
 export type BranchUtilities = Awaited<ReturnType<typeof branchUtilities>>;
@@ -21,18 +21,14 @@ export type StoreReturnType<T> = {
     set: <K extends keyof T>(key: K, value: T[K]) => void
 }
 
-export interface BaseHandlerArguments {
-    verbose?: boolean
-}
-
-export interface MiddlewareHandlerArguments extends BaseHandlerArguments{
+export interface MiddlewareHandlerArguments{
     _pak: {
         branch: BranchUtilities,
         prompts: Prompts,
         bugz: ReturnType<typeof createClient>,
-        logger: ReturnType<typeof makeLogger>,
         openInBrowser: typeof openInBrowser,
-        applicationError: typeof applicationError
+        applicationError: typeof applicationError,
+        runTasks: typeof runTasks
     }
 }
 
@@ -60,12 +56,3 @@ export interface Prompts {
     confirm: ConfirmPrompt,
     input: InputPrompt
 }
-
-export interface CleanUpProps {
-    branchName: string, 
-    branches: string[], 
-    defaultBranch: string,
-    vcs: VCS,
-    verbose: boolean       
-}
-

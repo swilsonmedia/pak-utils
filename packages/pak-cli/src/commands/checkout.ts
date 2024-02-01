@@ -10,7 +10,7 @@ export function builder(yargs: Argv) {
         .usage(`pak ${cmd}`);
 }
 
-export async function handler({ _pak: { branch, prompts, bugz, logger, applicationError }  }: MiddlewareHandlerArguments){
+export async function handler({ _pak: { runTasks, branch, prompts, bugz, applicationError }  }: MiddlewareHandlerArguments){
     try {
         const existingCaseIds = await branch.getExistingBugIds();
         const casesList = await bugz.listCases({cols: ['sTitle']});
@@ -32,11 +32,17 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
                 value: c.ixBug
             }))
         });
-        
-        logger.log(await branch.checkout(+id));
 
-        await bugz.edit(id, {'plugin_customfields_at_fogcreek_com_casexmilestoneh849': '3.Coding in Progress'});
-        logger.success(`Branch checkout complete!`, `Set Case Milestone to 3. Coding in Progress`);
+        await runTasks([
+            {
+                title: `Checkout Branch for case #${id}`,
+                task: async () => await branch.checkout(+id)
+            },
+            {
+                title: 'Set Case Milestone to 3. Coding in Progress', 
+                task: async () => await bugz.edit(id, {'plugin_customfields_at_fogcreek_com_casexmilestoneh849': '3.Coding in Progress'})
+            }
+        ]);        
     } catch (error) {
         applicationError(error);
     }

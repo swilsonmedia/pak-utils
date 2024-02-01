@@ -1,6 +1,5 @@
-import {logError} from "./logger.js";
 
 export default function applicationError(error: unknown){
-    logError(error);
+    console.error(error);
     process.exit(1);
 }

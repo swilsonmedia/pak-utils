@@ -10,11 +10,12 @@ export function builder(yargs: Argv) {
         .usage(`pak ${cmd}`);
 }
 
-export async function handler({ _pak: { branch, prompts, bugz, logger, applicationError } }: MiddlewareHandlerArguments){
+export async function handler({ _pak: { runTasks, branch, prompts, bugz, applicationError } }: MiddlewareHandlerArguments){
     try {
         const existingCaseIds = await branch.getExistingBugIds();
         const casesList = (await bugz.listCases({cols: ['sTitle', 'plugin_customfields_at_fogcreek_com_casexmilestoneh849']}))
                             .filter((bug: any) => bug.plugin_customfields_at_fogcreek_com_casexmilestoneh849.includes('6.Code Review Complete'));
+
         const existingCasesList = casesList.filter((c: any) => existingCaseIds.includes(c.ixBug));
         
         if (!existingCasesList.length) {   
@@ -29,8 +30,11 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
             }))
         });
 
-        logger.log(await branch.switchTo(+bugId));
-        
+        await runTasks({
+            title: `Switch to branch for case # ${bugId}`,
+            task: async () => await branch.switchTo(+bugId)
+        });
+    
         const checkins = await branch.logCaseCheckins(+bugId);
 
         if (!checkins.length) {
@@ -54,11 +58,16 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
             commitMessage = selectedMessage;
         }
 
-        
-        logger.log(await branch.merge(+bugId, commitMessage));
-        logger.log(await branch.delete(+bugId));
-        
-        logger.success(`Case # ${bugId} has been merged!`);
+        await runTasks([
+            {
+                title: `Merge case # ${bugId}`,
+                task: async () => await branch.merge(+bugId, commitMessage)                
+            },
+            {
+                title: `Delete branch`,
+                task: async () => await branch.delete(+bugId)
+            }
+        ]);
 
         const markCaseForRelease = await prompts.confirm({
             message: 'Send case to BuildMaster for release?',
@@ -66,13 +75,14 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
         });
 
         if(markCaseForRelease){
-            await bugz.edit(bugId, {
-                ixPersonAssignedTo: 51,
-                plugin_customfields_at_fogcreek_com_casexmilestoneh849: '7.Tagging in Progress (TP Required)',
-                sEvent: 'Ready for release.'
-            });            
-
-            logger.success(`Case # ${bugId} has been assigned to BuildMaster and set to case milestone 7!`);
+            await runTasks({
+                title: `Assign case # ${bugId} to BuildMaster and set to case milestone 7!}`,
+                task: async () => await bugz.edit(bugId, {    
+                    ixPersonAssignedTo: 51,
+                    plugin_customfields_at_fogcreek_com_casexmilestoneh849: '7.Tagging in Progress (TP Required)',
+                    sEvent: 'Ready for release.'
+                })
+            });
         }
 
         const mergeAnswer = await prompts.confirm({
@@ -98,9 +108,11 @@ export async function handler({ _pak: { branch, prompts, bugz, logger, applicati
                 message: 'Select the commit you would like to release?',
                 choices
             });        
-            
-            logger.log(await branch.pushCommitToRelease(commitHash, selectedRelease));
-            logger.success(`Merged ${commitHash} for release on ${selectedRelease}!`);
+
+            await runTasks({
+                title: `Merge ${commitHash} for release on ${selectedRelease}!`,
+                task: async () => await branch.pushCommitToRelease(commitHash, selectedRelease)
+            });
         }
     } catch (error) {
         applicationError(error);

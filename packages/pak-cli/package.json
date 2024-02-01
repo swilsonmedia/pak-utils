@@ -9,6 +9,7 @@
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.11.5",
     "@types/yargs": "^17.0.32",
+    "listr2": "^8.0.2",
     "typescript": "^5.3.3"
   },
   "scripts": {

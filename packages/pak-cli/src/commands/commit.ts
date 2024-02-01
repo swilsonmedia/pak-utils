@@ -1,7 +1,6 @@
 import { Argv } from 'yargs';
 import { MiddlewareHandlerArguments } from '../types.js';
 
-
 export const cmd = 'commit';
 
 export const description = 'Commit change to local and remote';
@@ -11,7 +10,7 @@ export function builder(yargs: Argv) {
         .usage(`pak ${cmd}`);
 }
 
-export async function handler({ _pak: { prompts, branch, logger, bugz, openInBrowser, applicationError } }: MiddlewareHandlerArguments){   
+export async function handler({ _pak: { runTasks, prompts, branch, bugz, openInBrowser, applicationError } }: MiddlewareHandlerArguments){   
     try {        
         const hasChanges = await branch.hasChanges();
         const hasUntracked = await branch.hasUntracked();
@@ -21,7 +20,7 @@ export async function handler({ _pak: { prompts, branch, logger, bugz, openInBro
         }
         
         if (hasUntracked) {
-            logger.log('You have untracked or unstaged changes')
+            console.log('You have untracked or unstaged changes')
             
             const wantToStage = await prompts.confirm({ 
                 message: 'Do you want to include unstaged changes in this commit?',
@@ -29,7 +28,10 @@ export async function handler({ _pak: { prompts, branch, logger, bugz, openInBro
             });
             
             if (wantToStage) {
-                logger.log(await branch.addAndStageAllChanges());                
+                await runTasks({
+                    title: `Add untracked to staging`,
+                    task: async () => await branch.addAndStageAllChanges()
+                });                
             }            
         }
         
@@ -39,9 +41,10 @@ export async function handler({ _pak: { prompts, branch, logger, bugz, openInBro
             message: 'Please enter a commit message',
         });
 
-        logger.log(await branch.commit(id, commitMessage));
-
-        logger.success('Committed changes to local and remote branch!');
+        await runTasks({
+            title: 'Commit changes to local and remote branch!',
+            task: async () => await branch.commit(id, commitMessage)
+        });
 
         const readyForCR = await prompts.confirm({
             message: 'Are you ready to send case to code review?',
@@ -77,7 +80,7 @@ export async function handler({ _pak: { prompts, branch, logger, bugz, openInBro
                 default: true,
             });
 
-            let summary = [];
+            let summary: string[] = [];
 
             if(!QATestable){
                 const notTestableNotes = await prompts.input({ message: 'Why is this case not testable?'});
@@ -120,17 +123,17 @@ export async function handler({ _pak: { prompts, branch, logger, bugz, openInBro
                 message: 'Enter case notes'
             });
 
-            logger.log(await bugz.edit(id, {
-                ixPersonAssignedTo: team,
-                plugin_customfields_at_fogcreek_com_casexmilestoneh849: '5.Ready for Review',
-                plugin_customfields_at_fogcreek_com_readyxforxsprintxqaj71b: QATestable ? 1 : 0,
-                plugin_customfields_at_fogcreek_com_qaxtestablek42: QATestable ? 'Yes' : 'No',
-                plugin_customfields_at_fogcreek_com_casexsummaryp32b: summary.join('\n\n'),
-                sEvent: `Code review please. ${notesForReviewer}`        
-            }));
-
-            logger.success('Case was sent for code review!');
-            
+            await runTasks({
+                title: `Assign case to code reviews and set milestone to step 5.`,
+                task: async () => await bugz.edit(id, {
+                    ixPersonAssignedTo: team,
+                    plugin_customfields_at_fogcreek_com_casexmilestoneh849: '5.Ready for Review',
+                    plugin_customfields_at_fogcreek_com_readyxforxsprintxqaj71b: QATestable ? 1 : 0,
+                    plugin_customfields_at_fogcreek_com_qaxtestablek42: QATestable ? 'Yes' : 'No',
+                    plugin_customfields_at_fogcreek_com_casexsummaryp32b: summary.join('\n\n'),
+                    sEvent: `Code review please. ${notesForReviewer}`        
+                })
+            });
         }
     } catch (error) {
         applicationError(error);

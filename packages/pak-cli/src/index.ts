@@ -14,10 +14,10 @@ import * as vcs from '@pak/vcs';
 import createClient from '@pak/bugz';
 import pkg from './utils/pkg.js';
 import branchUtilities from './utils/branch.js';
-import makeLogger from './utils/logger.js';
 import applicationError from './utils/applicationerror.js';
 import createStore from './utils/configurationstore.js';
 import openInBrowser from './utils/openinbrowser.js';
+import runTasks from './utils/tasks.js';
 
 (async () => {
     const pkgJSON = pkg();
@@ -42,7 +42,6 @@ import openInBrowser from './utils/openinbrowser.js';
                     message: 'What is the URL origin of your FogBugz website?'
                 }));
             }
-
             
             const branch = await branchUtilities(vcs, store.get('username'));
             
@@ -69,15 +68,13 @@ import openInBrowser from './utils/openinbrowser.js';
             
             bugz.setDefaultFilter(store.get('filter'));
 
-            const logger = makeLogger(!!args.quiet, !!args.verbose);
-
             return {
                 prompts,
                 branch,
                 bugz,
-                logger,
                 openInBrowser,
-                applicationError
+                applicationError,
+                runTasks
             };
         } catch (error) {
             applicationError(error);
@@ -102,11 +99,11 @@ import openInBrowser from './utils/openinbrowser.js';
     yargs(hideBin(process.argv))
         .scriptName(Object.keys(pkgJSON.bin)[0])
         .showHelpOnFail(true)
-        .command<MiddlewareHandlerArguments>(switchCommand.cmd, switchCommand.description, wrapDefaultOptions(switchCommand.builder), switchCommand.handler)
-        .command<MiddlewareHandlerArguments>(merge.cmd, merge.description, wrapDefaultOptions(merge.builder), merge.handler)
-        .command<MiddlewareHandlerArguments>(cleanup.cmd, cleanup.description, wrapDefaultOptions(cleanup.builder), cleanup.handler)
-        .command<MiddlewareHandlerArguments>(checkout.cmd, checkout.description, wrapDefaultOptions(checkout.builder), checkout.handler)
-        .command<MiddlewareHandlerArguments>(commit.cmd, commit.description, wrapDefaultOptions(commit.builder), commit.handler)
+        .command<MiddlewareHandlerArguments>(switchCommand.cmd, switchCommand.description, switchCommand.builder, switchCommand.handler)
+        .command<MiddlewareHandlerArguments>(merge.cmd, merge.description, merge.builder, merge.handler)
+        .command<MiddlewareHandlerArguments>(cleanup.cmd, cleanup.description, cleanup.builder, cleanup.handler)
+        .command<MiddlewareHandlerArguments>(checkout.cmd, checkout.description, checkout.builder, checkout.handler)
+        .command<MiddlewareHandlerArguments>(commit.cmd, commit.description, commit.builder, commit.handler)
         .command(config.cmd, config.description, config.builder, config.makeHandler(store))   
         .middleware(middleware)     
         .showHelpOnFail(true)
@@ -115,24 +112,3 @@ import openInBrowser from './utils/openinbrowser.js';
         .argv;       
 })();
 
-    function wrapDefaultOptions(builder: (yargs: Argv) => void){
-        return (yargs: Argv) => {
-            builder(yargs)
-
-            yargs
-                .options({
-                    'v': {
-                        alias: 'verbose',
-                        type: 'boolean',
-                        description: 'Display more logging',
-                        default: false
-                    },
-                    'q': {
-                        alias: 'quiet',
-                        type: 'boolean',
-                        description: 'No logs',
-                        default: false
-                    }
-                });  
-        }
-    };
