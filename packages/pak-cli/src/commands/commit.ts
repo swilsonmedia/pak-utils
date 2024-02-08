@@ -124,7 +124,7 @@ export async function handler({ _pak: { runTasks, prompts, branch, bugz, openInB
             });
 
             await runTasks({
-                title: `Assign case to code reviews and set milestone to step 5.`,
+                title: `Assign case to ${team} for code review and set milestone to step 5.`,
                 task: async () => await bugz.edit(id, {
                     ixPersonAssignedTo: team,
                     plugin_customfields_at_fogcreek_com_casexmilestoneh849: '5.Ready for Review',
