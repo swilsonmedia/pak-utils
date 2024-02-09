@@ -24,7 +24,7 @@ export async function handler({ _pak: { runTasks, prompts, branch, bugz, openInB
             
             const wantToStage = await prompts.confirm({ 
                 message: 'Do you want to include unstaged changes in this commit?',
-                default: false
+                default: true
             });
             
             if (wantToStage) {
