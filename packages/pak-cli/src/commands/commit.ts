@@ -75,6 +75,8 @@ export async function handler({ _pak: { runTasks, prompts, branch, bugz, openInB
                 choices: teams,
             });
 
+            const teamName = teams.find((person: any) => person.value === team)?.name;
+
             const QATestable = await prompts.confirm({
                 message: 'Is this QA testable?',
                 default: true,
@@ -85,38 +87,37 @@ export async function handler({ _pak: { runTasks, prompts, branch, bugz, openInB
             if(!QATestable){
                 const notTestableNotes = await prompts.input({ message: 'Why is this case not testable?'});
                 summary.push(`Not testable because:\n${notTestableNotes}`)
-            }
-
-            
-            const changesLocation = await prompts.input({
-                message: 'Where is the change? (URLs, DBs, Programs etc.)'
-            });
-
-            summary.push(`Where is the change? (URLs, DBs, Programs etc.):\n${changesLocation}`);
-            
-            const changesDescription = await prompts.input({
-                message: 'What was the change?'
-            });
-
-            summary.push(`What was the change?:\n${changesDescription}`);
-            
-            const Acceptance = await prompts.input({
-                message: 'Acceptance criteria (Happy path/steps to reproduce):'
-            });
-
-            summary.push(`Acceptance criteria (Happy path/steps to reproduce):\n${Acceptance}`);            
-            
-            const hasNotableRisks = await prompts.confirm({
-                message: 'Any notable risks and other notes?',
-                default: false
-            });
-            
-            if(hasNotableRisks){
-                const notableRisks = await prompts.input({
-                    message: 'Enter notable risks and other notes here'
+            }else{
+                const changesLocation = await prompts.input({
+                    message: 'Where is the change? (URLs, DBs, Programs etc.)'
                 });
-                summary.push(`Notable risks and other notes:\n${notableRisks}`);      
-            }
+
+                summary.push(`Where is the change? (URLs, DBs, Programs etc.):\n${changesLocation}`);
+                
+                const changesDescription = await prompts.input({
+                    message: 'What was the change?'
+                });
+
+                summary.push(`What was the change?:\n${changesDescription}`);
+                
+                const Acceptance = await prompts.input({
+                    message: 'Acceptance criteria (Happy path/steps to reproduce):'
+                });
+
+                summary.push(`Acceptance criteria (Happy path/steps to reproduce):\n${Acceptance}`);            
+                
+                const hasNotableRisks = await prompts.confirm({
+                    message: 'Any notable risks and other notes?',
+                    default: false
+                });
+                
+                if(hasNotableRisks){
+                    const notableRisks = await prompts.input({
+                        message: 'Enter notable risks and other notes here'
+                    });
+                    summary.push(`Notable risks and other notes:\n${notableRisks}`);      
+                }
+            }                      
 
 
             const notesForReviewer = await prompts.input({
@@ -124,7 +125,7 @@ export async function handler({ _pak: { runTasks, prompts, branch, bugz, openInB
             });
 
             await runTasks({
-                title: `Assign case to ${team} for code review and set milestone to step 5.`,
+                title: `Assigned case to ${teamName} for code review and set milestone to step 5.`,
                 task: async () => await bugz.edit(id, {
                     ixPersonAssignedTo: team,
                     plugin_customfields_at_fogcreek_com_casexmilestoneh849: '5.Ready for Review',
