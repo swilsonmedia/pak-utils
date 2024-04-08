@@ -23,7 +23,7 @@ export async function handler({ _pak: { runTasks, branch, prompts, bugz, applica
         }
 
         const bugId = await prompts.select({
-            message: 'Select a case that would you like to create a branch for?',
+            message: 'Select a case that would you like to merge?',
             choices: existingCasesList.map((c: any) => ({
                 name: `${c.ixBug}: ${c.sTitle}`,
                 value: c.ixBug

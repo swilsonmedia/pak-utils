@@ -201,6 +201,7 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
     const checkout = async (id: number) => {
         const branchName = buildBranchName(id);
         return joinLogs(
+            await switchTo(defaultBranch),
             await vcs.checkout(branchName),
             await vcs.setUpstream(branchName)
             )
