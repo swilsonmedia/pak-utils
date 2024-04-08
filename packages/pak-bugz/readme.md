@@ -1,14 +1,13 @@
 # Bugz API
 
-A JS API to interact with your FogBugz instance.
+An API to interact with your FogBugz instance.
 
-## Install
+## Install and Build
 
-```sh 
-npm install bugz-api
-```
+See install and build steps [here](../../readme.md).
 
 ### Creating a client
+
 ```js
 import bugzClient from 'bugz-api';
 
@@ -16,7 +15,6 @@ const client = bugzClient({
     token: 'asdfghjklqwer', // your private token
     domain: 'http://fogbugz.example.com' // your base fogbugz URL
 });
-
 ```
 
 ## bugzClient

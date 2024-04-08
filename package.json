@@ -10,9 +10,9 @@
     "postbuild": "npm link ./packages/pak-cli"
   },
   "workspaces": [
-    "packages/pak-cli",
     "packages/pak-vcs",
-    "packages/pak-bugz"
+    "packages/pak-bugz",
+    "packages/pak-cli"
   ],
   "engines": {
     "node": ">=18.0.0"

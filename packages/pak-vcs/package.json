@@ -1,7 +1,7 @@
 {
   "name": "@pak/vcs",
   "version": "1.0.0",
-  "description": "A small subset of GIT commands",
+  "description": "An API for interacting with a GIT version control system.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {

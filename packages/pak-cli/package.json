@@ -1,7 +1,7 @@
 {
   "name": "pak-cli",
   "version": "1.0.0",
-  "description": "",
+  "description": "CLI to that wraps Bug & VCS APIs into a set of methods to improve workflow.",
   "bin": {
     "pak": "./dist/index.js"
   },

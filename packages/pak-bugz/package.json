@@ -1,7 +1,7 @@
 {
   "name": "@pak/bugz",
   "version": "1.0.0",
-  "description": "A simple API to interact with Fogbugz",
+  "description": "An API to interact with your FogBugz instance.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
