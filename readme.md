@@ -1,10 +1,10 @@
 # Pak Utils
 
-A monorepo of helpful Pak developer utilities.
+A collection of helpful Pak related developer utilities.
 
 ## Install
 
-Install dependencies.
+Install all dependencies within the workspace.
 
 ```sh
 npm install -ws
