@@ -1,6 +1,7 @@
 import { Argv } from "yargs";
 import { StoreConfig } from "../types.js";
 import applicationError from "../utils/applicationerror.js";
+import makeConfigPrompts from "../utils/config.js";
 
 export const cmd = 'config'
 
@@ -39,25 +40,37 @@ export function builder(yargs: Argv){
 }
 
 export function makeHandler(store: StoreConfig){  
-    return async (args: any) => {
-        if(Object.keys(args).length <= 2){
-            applicationError('No arguments were passed. Please see "pak config --help" to see the what are available.');
-        }
+    return async ({ username, token, origin, filter, _pak: {bugz}}: any) => {
+        try {
+            if(!username && !token && !origin && !filter){
+                const config = makeConfigPrompts(store);
+                const choices = (await bugz.listFilters())
+                    .filter((f: any) => f.type === 'saved')
+                    .map((f: any) => ({
+                        name: f.text,
+                        value: f.sFilter
+                    }));
 
-        if(args.username){
-            await store.set('username', args.username);
-        }
+                await config.all(choices);
+            }
 
-        if(args.token){
-            await store.set('token', args.token);
-        }
+            if(username){
+                await store.set('username', username);
+            }
 
-        if(args.origin){
-            await store.set('origin', args.origin);
-        }
+            if(token){
+                await store.set('token', token);
+            }
 
-        if(args.filter){
-            await store.set('filter', args.filter);
+            if(origin){
+                await store.set('origin', origin);
+            }
+
+            if(filter){
+                await store.set('filter', filter);
+            }
+        } catch (error) {
+            applicationError(error);
         }
     };
 }   

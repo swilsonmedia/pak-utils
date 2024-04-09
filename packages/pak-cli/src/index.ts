@@ -18,30 +18,16 @@ import applicationError from './utils/applicationerror.js';
 import createStore from './utils/configurationstore.js';
 import openInBrowser from './utils/openinbrowser.js';
 import runTasks from './utils/tasks.js';
+import makeConfigPrompts from './utils/config.js';
 
 (async () => {
     const pkgJSON = pkg();
     const store = await createStore<StoreConfigProps>(path.join(import.meta.dirname, '../.pak'));
+    const configPrompts = makeConfigPrompts(store);
 
     const getPakParameters = async (args: Arguments) => {       
         try {
-            if(!store.has('username')){
-                await store.set('username', await prompts.input({
-                    message: 'What username do you use for GIT branching?'
-                }));
-            }
-
-            if(!store.has('token')){
-                await store.set('token', await prompts.input({
-                    message: 'What is your FogBugz API access token?'
-                }));
-            }
-
-            if(!store.has('origin')){
-                await store.set('origin', await prompts.input({
-                    message: 'What is the URL origin of your FogBugz website?'
-                }));
-            }
+            await configPrompts.all();
             
             const branch = await branchUtilities(vcs, store.get('username'));
             
@@ -58,12 +44,7 @@ import runTasks from './utils/tasks.js';
                                     value: f.sFilter
                                 }));
                             
-                const selectedFilter = await prompts.select({
-                    message: 'What is the FogBugz saved filter you monitor for cases?',
-                    choices
-                })
-                
-                await store.set('filter', selectedFilter.toString());
+                await configPrompts.filter(choices);
             }
             
             bugz.setDefaultFilter(store.get('filter'));
@@ -88,10 +69,6 @@ import runTasks from './utils/tasks.js';
             }
         },
         async (args: Arguments) => {
-            if(args._.includes('config')){
-                return;
-            }
-
             args._pak = await getPakParameters(args);
         }
     ];

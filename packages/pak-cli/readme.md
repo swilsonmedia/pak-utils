@@ -4,11 +4,21 @@ Pak CLI wraps Bug & VCS APIs into a set utilities designed to make your day of d
 
 ![Terminal display of basic pak usage](./docs/pak-no-command.png)
 
-## Install and Build
+## Getting Started
 
-See install and build steps [here](../../readme.md).
+1. Install and build project by following the steps [here](../../readme.md). 
+2. Set required configuration entries by running ```pak config``` in the terminal.
 
-## Usage
+## Available Commands
+
+* [help](#help)
+* [switch](#switch)
+* [merge](#merge)
+* [cleanup](#cleanup)
+* [checkout](#checkout)
+* [commit](#commit)
+* [config](#config)
+
 
 ### Help 
 
@@ -25,7 +35,7 @@ pak --help
 ```
 
 ### switch
-This command will prompt you with list available branches that you can switch to (master, release branches & bug branches).  It will switch the repo to the selected branch.
+This command will prompt you with list available branches that you can switch to (master, release branches & existing branches).  It will switch the repo to the selected branch.
 
 #### Example
 ```sh
@@ -33,7 +43,7 @@ pak switch
 ```
 
 ### merge
-This command will prompt you with list available bug branches where the case is in step 6. (ok to merge).  It will merged code from your selected branch to master and walk you through prompts to assign case to Buildmaster and set step to 7.
+This command will prompt you with list available branches where the case is in step 6. (ok to merge).  It will merged code from case's related branch to master and walk you through prompts to assign case to Buildmaster and set step to 7.
 
 #### Example
 ```sh
@@ -42,7 +52,7 @@ pak merge
 
 ### cleanup
 
-This command will prompt you with list available bug branches that can be deleted.  It will delete the local and remote branch of the selected.
+This command will prompt you with list available branches that can be deleted.  It will delete the local and remote branch of the selected.
 
 #### Example
 ```sh
@@ -50,7 +60,7 @@ pak cleanup
 ```
 
 ### checkout
-This command will prompt you with list available bugs from Fogbugz that don't have branches yet.  It will create a local and remote branch from your selection and update your bug to step 3.
+This command will prompt you with list available cases in Fogbugz that don't have branches yet.  It will create a local and remote branch from your selection and update case's step to 3 (Coding in Progress).
 
 #### Example
 ```sh
@@ -58,7 +68,7 @@ pak checkout
 ```
 
 ### commit
-This command will walk you through prompts to add unstaged changes, add a message, and options to move to code review.
+This command will walk you through prompts to add unstaged changes, add a message, and options to move to case into code review by assigning to a selected team and setting the case's step to 5(Ready for Review).
 
 #### Example
 ```sh
@@ -83,6 +93,14 @@ Options:
 ```
 
 #### Example
+to be prompted for all config properties
+
+```sh
+pak config 
+```
+
+or with optional parameters 
+
 ```sh
 pak config -u myusername
 ```
