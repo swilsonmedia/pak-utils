@@ -9,7 +9,7 @@ Pak CLI wraps Bug & VCS APIs into a set utilities designed to make your day of d
 1. Install and build project by following the steps [here](../../readme.md). 
 2. Set required configuration entries by running ```pak config``` in the terminal.
 
-<video src="./docs/Pak Build Install Config.mp4" width="640" height="480" controls></video>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/pMblP4Ygx4A?si=eZd_7HBrKdtaO47i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Available Commands
 
