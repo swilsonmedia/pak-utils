@@ -9,6 +9,8 @@ Pak CLI wraps Bug & VCS APIs into a set utilities designed to make your day of d
 1. Install and build project by following the steps [here](../../readme.md). 
 2. Set required configuration entries by running ```pak config``` in the terminal.
 
+<video src="./docs/Pak Build Install Config.mp4" width="640" height="480" controls></video>
+
 ## Available Commands
 
 * [help](#help)
@@ -61,6 +63,8 @@ pak cleanup
 
 ### checkout
 This command will prompt you with list available cases in Fogbugz that don't have branches yet.  It will create a local and remote branch from your selection and update case's step to 3 (Coding in Progress).
+
+<video src="./docs/Checkout.mp4" width="640" height="480" controls></video>
 
 #### Example
 ```sh
