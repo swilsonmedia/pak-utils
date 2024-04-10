@@ -9,7 +9,7 @@ A CLI that helps to simplify and speed up a developer's workflow.  It removes ma
 ## Getting Started
 
 1. Install and build project by following the steps [here](../../readme.md). 
-2. Set required configuration entries by running ```pak config``` in the terminal.
+2. Set required configuration entries by running the [config](#config) command.
 
 ## Available Commands
 
@@ -149,6 +149,17 @@ Options:
 
 #### Example
 to be prompted for all config properties
+
+
+#### Prompts 
+| Prompt     | Type   | Description                                                           |
+|--------------|--------|-----------------------------------------------------------------------|
+| Username     | input |  (required) the name used in branch construction ex: /users/{name}/fb-1234 |
+| Access Token     | input |  (required) an API token from FogBugz.  |
+| Origin URL     | input |  (required) the origin URL of FogBugz.  http://www.example.com |
+| Filter     | select |  (required) Select a saved filter from FogBugz for this CLI to monitor for new cases |
+
+
 
 ```sh
 pak config 
