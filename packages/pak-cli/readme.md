@@ -14,11 +14,11 @@ A CLI that helps to simplify and speed up a developer's workflow.  It removes ma
 ## Available Commands
 
 * [help](#help)
-* [switch](#switch)
-* [merge](#merge)
-* [cleanup](#cleanup)
 * [checkout](#checkout)
 * [commit](#commit)
+* [merge](#merge)
+* [switch](#switch)
+* [cleanup](#cleanup)
 * [config](#config)
 
 
@@ -36,59 +36,13 @@ or
 pak --help
 ```
 
-### switch
-This command will prompt you with list available branches that you can switch to (master, release branches & existing branches).  It will switch the repo to the selected branch.
-
-#### Prompts 
-| Prompt     | Type   | Description                                                           |
-|--------------|--------|-----------------------------------------------------------------------|
-| Select branch      | select |  (required) Displays a list of branches |
-
-
-![switch](./docs/switch.gif)
-
-#### Example
-```sh
-pak switch
-```
-
-### merge
-This command will prompt you with list of available branches where the case is in step 6. (ok to merge).  It will merge code from case's branch to master and walk you through prompts to assign case to Buildmaster and set step to 7.
-
-#### Prompts 
-| Prompt     | Type   | Description                                                           |
-|--------------|--------|-----------------------------------------------------------------------|
-| Select case      | select |  (required) Displays a list of cases ready to merge |
-| Select or enter commit message      | select |  (required) Asks you to enter a new message or select a previously commited message |
-| Send to Buildmaster     | yes (default) / no |  (optional) - Do you want to update FogBugz and send to BM? |
-| Merge to release     | yes / no (default) |  (optional) - Do you need to merge to a release tag? |
-| Select release     | select |  (required for merge to release) - Displays a list of release dates |
-| Select commit to release     | select |  (required for merge to release) - Displays a list of related commits for case  |
-
-
-![merge](./docs/merge.gif)
-
-#### Example
-```sh
-pak merge
-```
-
-### cleanup
-
-This command will prompt you with list available branches that can be deleted.  It will delete the local and remote branch of the selected.
-
-#### Example
-```sh
-pak cleanup
-```
-
-#### Prompts 
-| Prompt     | Type   | Description                                                           |
-|--------------|--------|-----------------------------------------------------------------------|
-| Select branch      | select |  (required) Displays a list of branches |
-
 ### checkout
 This command will prompt you with list available cases in Fogbugz that don't have branches yet.  It will create a local and remote branch from your selection and update case's step to 3 (Coding in Progress).
+
+#### Prompts 
+| Prompt     | Type   | Description                                                           |
+|--------------|--------|-----------------------------------------------------------------------|
+| Select branch      | select |  (required) Displays a list of cases |
 
 ![checkout](./docs/checkout.gif)
 
@@ -119,6 +73,62 @@ This command will walk you through prompts for adding unstaged changes, a commit
 ```sh
 pak commit
 ```
+
+### merge
+This command will prompt you with list of available branches where the case is in step 6. (ok to merge).  It will merge code from case's branch to master and walk you through prompts to assign case to Buildmaster and set step to 7.
+
+#### Prompts 
+| Prompt     | Type   | Description                                                           |
+|--------------|--------|-----------------------------------------------------------------------|
+| Select case      | select |  (required) Displays a list of cases ready to merge |
+| Select or enter commit message      | select |  (required) Asks you to enter a new message or select a previously commited message |
+| Send to Buildmaster     | yes (default) / no |  (optional) - Do you want to update FogBugz and send to BM? |
+| Merge to release     | yes / no (default) |  (optional) - Do you need to merge to a release tag? |
+| Select release     | select |  (required for merge to release) - Displays a list of release dates |
+| Select commit to release     | select |  (required for merge to release) - Displays a list of related commits for case  |
+
+
+![merge](./docs/merge.gif)
+
+#### Example
+```sh
+pak merge
+```
+
+### switch
+This command will prompt you with list available branches that you can switch to (master, release branches & existing branches).  It will switch the repo to the selected branch.
+
+#### Prompts 
+| Prompt     | Type   | Description                                                           |
+|--------------|--------|-----------------------------------------------------------------------|
+| Select branch      | select |  (required) Displays a list of branches |
+
+
+![switch](./docs/switch.gif)
+
+#### Example
+```sh
+pak switch
+```
+
+
+
+### cleanup
+
+This command will prompt you with list available branches that can be deleted.  It will delete the local and remote branch of the selected.
+
+#### Example
+```sh
+pak cleanup
+```
+
+#### Prompts 
+| Prompt     | Type   | Description                                                           |
+|--------------|--------|-----------------------------------------------------------------------|
+| Select branch      | select |  (required) Displays a list of branches |
+
+
+
 
 ### config
 Set config properties.
