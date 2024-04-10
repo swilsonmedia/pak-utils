@@ -159,7 +159,7 @@ to be prompted for all config properties
 | Origin URL     | input |  (required) the origin URL of FogBugz.  http://www.example.com |
 | Filter     | select |  (required) Select a saved filter from FogBugz for this CLI to monitor for new cases |
 
-
+*Access Token can be found in FogBugz under "User Options" => "Create API Token"
 
 ```sh
 pak config 
