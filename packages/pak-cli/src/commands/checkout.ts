@@ -25,13 +25,28 @@ export async function handler({ _pak: { runTasks, branch, prompts, bugz, applica
             applicationError('There are no new cases to checkout that you have not already.  Try using the "switch" command.');        
         }
 
-        const id = await prompts.select({
+        const enteredNumber = -1;
+
+        let id = await prompts.select({
             message: 'Select a case that would you like to create a branch for?',
             choices: casesListExcludingExisting.map((c: any) => ({
                 name: `${c.ixBug}: ${c.sTitle}`,
                 value: c.ixBug
-            }))
+            })).concat([{
+                name: 'Enter case number?',
+                value: enteredNumber
+            }])
         });
+
+        if(+id === enteredNumber){
+            id = await prompts.input({
+                message: 'Enter case number'
+            });
+        }
+
+        if(!id || !/^\d+$/gi.test(id)){
+            applicationError('The case number entered was not a number.');
+        }
 
         await runTasks([
             {
