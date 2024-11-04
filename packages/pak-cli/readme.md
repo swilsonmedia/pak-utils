@@ -18,6 +18,7 @@ A CLI that helps to simplify and speed up a developer's workflow.  It removes ma
 * [commit](#commit)
 * [merge](#merge)
 * [switch](#switch)
+* [update](#update)
 * [cleanup](#cleanup)
 * [config](#config)
 
@@ -109,6 +110,16 @@ This command will prompt you with list available branches that you can switch to
 #### Example
 ```sh
 pak switch
+```
+
+### update
+This command will update a Front End Developer's developer environment's default branch that Teamcity uses.
+
+![update](./docs/update.gif)
+
+#### Example
+```sh
+pak update
 ```
 
 
