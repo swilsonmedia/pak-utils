@@ -28,7 +28,7 @@ const RELEASE_STRING = 'releasetags/';
 const MESSAGE_PREFIX = 'BugzId: ';
 const MESSAGE_SEPARATOR = ' - ';
 
-export default async function branchUtilities(vcs: VCS, userName: string, ){
+export default async function branchUtilities(vcs: VCS, userName: string, defaultDevBoxBranch: string){
     const BRANCH_NAME_PREFIX = `users/${userName}/fb-`;
 
     const buildBranchName = (id: number) => {
@@ -96,6 +96,21 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
                     : input;
 
         return await vcs.switchToBranch(branchName);
+    };
+
+    const updateDevBoxBranch = async () => {
+        if(!defaultDevBoxBranch){
+            throw new Error('A defaultDevBoxBranch config entry was not found');
+        }
+
+        return joinLogs(
+            await vcs.switchToBranch(defaultBranch),
+            await vcs.pull(),
+            await switchTo(defaultDevBoxBranch),
+            await vcs.merge(defaultBranch, 'merging master to branch', false),
+            await vcs.push(),
+            await vcs.switchToBranch(defaultBranch)
+        );
     };
 
     const commit = async (id: number, message: string) => {
@@ -261,7 +276,8 @@ export default async function branchUtilities(vcs: VCS, userName: string, ){
         parseIdFromCurrent,
         pushCommitToRelease,
         merge,
-        switchTo
+        switchTo,
+        updateDevBoxBranch
     }
 }
 

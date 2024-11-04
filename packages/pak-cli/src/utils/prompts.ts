@@ -12,7 +12,7 @@ export async function select({ message, choices }: SelectPromptParams): Promise<
     return answer;
 }
 
-export async function input({ message, default: defaultValue }: GenericPromptParams): Promise<string> {
+export async function input({ message, default: defaultValue }: {message: string, default?: string}): Promise<string> {
     const { answer } = await inquirer.prompt({
         name: 'answer',
         message,
@@ -23,7 +23,7 @@ export async function input({ message, default: defaultValue }: GenericPromptPar
     return answer;
 }
 
-export async function confirm({ message, default: defaultValue }: GenericPromptParams): Promise<string> {
+export async function confirm({ message, default: defaultValue }: {message: string, default?: boolean}): Promise<string> {
     const { answer } = await inquirer.prompt({
         name: 'answer',
         message,

@@ -29,11 +29,25 @@ export default function makeConfigPrompts(store: StoreConfig){
             await store.set('filter', selectedFilter.toString());
         };
 
+        const defaultDevBoxBranch = async () => {
+            const answer = await prompts.confirm({message: 'Are you a Front End Developer with a virtual machine as a dev box?', default: false});
+
+            if(!answer){
+                await store.set('defaultDevBoxBranch', '');
+                return;
+            }
+
+            await store.set('defaultDevBoxBranch', await prompts.input({
+                message: 'What is the default branch used on your developer environment? (ex: "fed/defaultfordev10")'
+            }));
+        }
+
     return {
         username,
         token,
         origin,
         filter,
+        defaultDevBoxBranch,
         all: async (choices?: []) => {
             if(!store.has('username')){
                 await username();
@@ -49,6 +63,10 @@ export default function makeConfigPrompts(store: StoreConfig){
 
             if(!store.has('filter') && choices){
                 await filter(choices);
+            }
+
+            if(!store.has('defaultDevBoxBranch')){
+                await defaultDevBoxBranch();
             }
         }
     }

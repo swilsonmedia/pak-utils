@@ -9,6 +9,7 @@ import * as checkout from './commands/checkout.js';
 import * as commit from './commands/commit.js';
 import * as cleanup from './commands/cleanup.js';
 import * as merge from './commands/merge.js';
+import * as update from './commands/update.js';
 import * as prompts from './utils/prompts.js';
 import * as vcs from '@pak/vcs';
 import createClient from '@pak/bugz';
@@ -29,7 +30,7 @@ import makeConfigPrompts from './utils/config.js';
         try {
             await configPrompts.all();
             
-            const branch = await branchUtilities(vcs, store.get('username'));
+            const branch = await branchUtilities(vcs, store.get('username'), store.get('defaultDevBoxBranch'));
             
             const bugz = createClient({
                 token: store.get('token'),
@@ -81,6 +82,7 @@ import makeConfigPrompts from './utils/config.js';
         .command<MiddlewareHandlerArguments>(cleanup.cmd, cleanup.description, cleanup.builder, cleanup.handler)
         .command<MiddlewareHandlerArguments>(checkout.cmd, checkout.description, checkout.builder, checkout.handler)
         .command<MiddlewareHandlerArguments>(commit.cmd, commit.description, commit.builder, commit.handler)
+        .command<MiddlewareHandlerArguments>(update.cmd, update.description, update.builder, update.handler)
         .command(config.cmd, config.description, config.builder, config.makeHandler(store))   
         .middleware(middleware)     
         .showHelpOnFail(true)

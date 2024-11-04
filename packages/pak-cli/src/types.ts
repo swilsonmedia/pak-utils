@@ -12,7 +12,8 @@ export interface StoreConfigProps {
     username: string,    
     token: string,
     origin: string,
-    filter: string
+    filter: string,
+    defaultDevBoxBranch: string
 }
 
 export type StoreReturnType<T> = {
