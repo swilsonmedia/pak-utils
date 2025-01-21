@@ -2,7 +2,7 @@
 import path from 'path';
 import yargs, {Arguments, Argv} from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
+import { CheckoutMiddlewareHandlerArguments, MiddlewareHandlerArguments, StoreConfigProps } from './types.js';
 import * as switchCommand from './commands/switch.js';
 import * as config from './commands/config.js';
 import * as checkout from './commands/checkout.js';
@@ -80,7 +80,7 @@ import makeConfigPrompts from './utils/config.js';
         .command<MiddlewareHandlerArguments>(switchCommand.cmd, switchCommand.description, switchCommand.builder, switchCommand.handler)
         .command<MiddlewareHandlerArguments>(merge.cmd, merge.description, merge.builder, merge.handler)
         .command<MiddlewareHandlerArguments>(cleanup.cmd, cleanup.description, cleanup.builder, cleanup.handler)
-        .command<MiddlewareHandlerArguments>(checkout.cmd, checkout.description, checkout.builder, checkout.handler)
+        .command<CheckoutMiddlewareHandlerArguments>(checkout.cmd, checkout.description, checkout.builder, checkout.handler)
         .command<MiddlewareHandlerArguments>(commit.cmd, commit.description, commit.builder, commit.handler)
         .command<MiddlewareHandlerArguments>(update.cmd, update.description, update.builder, update.handler)
         .command(config.cmd, config.description, config.builder, config.makeHandler(store))   

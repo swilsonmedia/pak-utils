@@ -33,6 +33,10 @@ export interface MiddlewareHandlerArguments{
     }
 }
 
+export interface CheckoutMiddlewareHandlerArguments extends MiddlewareHandlerArguments {
+    casenumber?: number
+}
+
 export type StoreConfig = StoreReturnType<StoreConfigProps>
 
 export type QuestionsFunc = {

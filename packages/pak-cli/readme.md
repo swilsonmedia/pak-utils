@@ -52,6 +52,19 @@ This command will prompt you with list available cases in Fogbugz that don't hav
 pak checkout
 ```
 
+or
+
+```sh
+pak checkout -c 12345
+```
+
+#### Usage
+
+```
+Options:
+  -c, --casenumber        Skip the prompts and enter a casenumber         [number]
+```
+
 ### commit
 This command will walk you through prompts for adding unstaged changes, a commit message, and other options that move a case into code review by assigning the case to a selected team and setting the case's step to 5(Ready for Review).
 
